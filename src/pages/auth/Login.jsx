@@ -75,7 +75,7 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
             <div className="w-full lg:w-[80%] flex justify-end">
-              <a href="#" className="font-semibold text-md hover:underline">Olvidé mi contraseña</a>
+              <a href="/reset-password" className="font-semibold text-md hover:underline">Olvidé mi contraseña</a>
             </div>
 
             <button

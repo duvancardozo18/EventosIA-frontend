@@ -16,7 +16,7 @@ const AppRouter = () => {
         <Route path='/verifyAccount/:token' element={<VerifyAccount />} /> {/* ✅ Acepta token */}
         <Route path='/home' element={<Homepage />} />
         <Route path='/reset-password' element={<ResetPassword />}/>
-        <Route path='/reset-form' element={<ResetPasswordForm />}/>
+        <Route path='/reset-form/:token' element={<ResetPasswordForm />}/>
     </Routes>
     
 

@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.8",
-    "frontend": "file:",
     "axios": "^1.7.9",
+    "frontend": "file:",
     "nodemailer": "^6.10.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

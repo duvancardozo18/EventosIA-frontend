@@ -1,44 +1,53 @@
 @import "tailwindcss";
+@tailwind utilities;
 
-#root {
-  width: 100%;
-  height: 100%;
-  margin: 0 auto;
-  padding: 0;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+@layer base {
+    body {
+        @apply [scrollbar-color:_#cbd5e1_transparent];
+    }
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+@layer components {
+    .sidebar-group {
+        @apply flex flex-col w-full gap-y-2;
+    }
+
+    .sidebar-group-title {
+        @apply overflow-hidden text-sm font-medium text-ellipsis text-slate-600 ;
+    }
+
+    .sidebar-item {
+        @apply flex h-[40px] w-full flex-shrink-0 items-center gap-x-3 rounded-lg p-3 text-base font-medium text-slate-900 transition-colors hover:bg-blue-50 ;
+        &.active {
+            @apply bg-[#4c84de] text-slate-50 ;
+        }
+    }
+
+    .title {
+        @apply text-3xl font-semibold transition-colors text-slate-900 ;
+    }
+
+    .btn-ghost {
+        @apply flex items-center justify-center flex-shrink-0 h-10 p-2 transition-colors rounded-lg gap-x-2 text-slate-500 hover:bg-blue-50 hover:text-slate-500;
+    }
+
+    .link {
+        @apply text-base font-medium transition-colors text-slate-900 hover:underline;
+    }
+
+    .input {
+        @apply hidden h-10 flex-shrink-0 items-center gap-x-2 rounded-lg border border-slate-300 px-2 text-base text-slate-900 transition-colors has-[input:focus]:border-blue-500 md:flex md:w-auto lg:w-80;
+    }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.recharts-default-tooltip {
+    @apply !rounded-lg !border !border-slate-300 !bg-white transition-colors dark:!border-slate-700 dark:!bg-slate-900;
 }
 
-.card {
-  padding: 2em;
+.recharts-tooltip-label {
+    @apply text-base font-medium text-slate-900 dark:text-slate-50;
 }
 
-.read-the-docs {
-  color: #888;
+.recharts-tooltip-item {
+    @apply text-base font-medium !text-blue-500 dark:!text-blue-600;
 }

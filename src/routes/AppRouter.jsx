@@ -35,7 +35,7 @@ function AppRouter() {
             element: <ResetPasswordForm />,
         },
         {
-            path: "/eventDashboard",
+            path: "/dashboard",
             element: <Layout />,
             children: [
                 {

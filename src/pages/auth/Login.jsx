@@ -28,7 +28,7 @@ const Login = () => {
 
       localStorage.setItem('token', data.token);
 
-      navigate('/home');
+      navigate('/dashboard');
     } catch (err) {
       if (err.response) {
         setError(err.response.data.error || 'Error en el servidor');

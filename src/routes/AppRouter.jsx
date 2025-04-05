@@ -14,14 +14,11 @@ import Register from "../pages/auth/Register";
 import ResetPassword from "../pages/forgotpassword/ResetPassword";
 import ResetPasswordForm from "../pages/forgotpassword/ResetPasswordForm";
 import Layout from "./layout";
-import CardsView from "../components/screens/events/CardsView";
-import GeneralEvent from "../components/screens/events/eventscreate/form/GeneralEvent";
-import CreateEvent from "../components/screens/events/eventscreate/CreateEvent";
-import LocationEvent from "../components/screens/events/eventscreate/form/LocationEvent";
-import ParticipantsEvent from "../components/screens/events/eventscreate/form/ParticipantsEvent";
-import FeedingEvent from "../components/screens/events/eventscreate/form/FeedingEvent";
-import ResourcesEvent from "../components/screens/events/eventscreate/form/ResourcesEvent";
-import EventForm from "../components/screens/events/eventscreate/form/Event"
+import CardsView from "../screens/events/CardsView";
+import Event from "../screens/events/createEvent/tabs/Event";
+import TypeEvent from "../screens/events/createEvent/tabs/TypeEvent";
+import LocationEvent from "../screens/events/createEvent/tabs/LocationEvent";
+import CreateEvent from "../screens/events/createEvent/CreateEvent";
 
 function AppRouter() {
     const router = createBrowserRouter([
@@ -78,12 +75,9 @@ function AppRouter() {
                     element: <PrivateRoute element={<CreateEvent />} />, // Usa el provisional
                     children: [
                         { index: true, element: <Navigate to="evento" replace /> },
-                        { path: "evento", element: <EventForm /> },
-                        { path: "tipoEvento", element: <GeneralEvent /> },
-                        { path: "ubicacion", element: <LocationEvent /> },
-                        { path: "participantes", element: <ParticipantsEvent /> },
-                        { path: "alimentacion", element: <FeedingEvent /> },
-                        { path: "recursos", element: <ResourcesEvent /> }
+                        { path: "evento", element: <Event /> },
+                        { path: "tipoEvento", element: <TypeEvent /> },
+                        { path: "ubicacion", element: <LocationEvent /> }
                     ]
                 }
             ],

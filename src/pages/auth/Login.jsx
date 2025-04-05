@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import InputItem from '../../components/InputItem';
-import axios from 'axios';
+import axiosInstance from '../../config/axiosInstance';
+import { AuthContext } from '../../config/AuthProvider';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { login } = useContext(AuthContext); // Usa la función de login del contexto
   const navigate = useNavigate();
-
-  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
 
     try {
-      const { data } = await axios.post(`${API_URL}/login`, {
+      const { data } = await axiosInstance.post('/login', {
         email,
         password
       });
@@ -26,8 +26,11 @@ const Login = () => {
         return;
       }
 
-      localStorage.setItem('token', data.token);
-
+      // Storing token and updating auth context
+      localStorage.setItem('access_token', data.token);
+      login(data.token); // Utiliza la función login del contexto para guardar el token
+      //console.log("Token guardado:", data.token);
+      
       navigate('/dashboard');
     } catch (err) {
       if (err.response) {
@@ -44,6 +47,7 @@ const Login = () => {
     <div className="w-full h-full min-h-screen bg-[#d9e6f5] flex flex-col items-center justify-center">
       <div className="w-[70%] bg-white flex shadow-lg rounded-md p-10">
 
+        {/* Sección de imagen (solo visible en pantallas grandes) */}
         <div className="hidden lg:w-[50%] lg:flex flex-col items-center justify-center border-r border-gray-300">
           <img
             src="https://tecdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
@@ -52,6 +56,7 @@ const Login = () => {
           />
         </div>
 
+        {/* Sección de formulario */}
         <div className="w-full lg:w-[50%] flex flex-col items-center justify-center px-2">
           <h1 className="text-4xl font-bold mb-5 text-center">INICIO DE SESIÓN</h1>
 

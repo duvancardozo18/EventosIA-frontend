@@ -4,44 +4,65 @@ const sections = [
   { id: "evento", name: "Evento", path: "/dashboard/events/create-event/evento" },
   { id: "tipoEvento", name: "Tipo Evento", path: "/dashboard/events/create-event/tipoEvento" },
   { id: "ubicacion", name: "Ubicación", path: "/dashboard/events/create-event/ubicacion" },
-  { id: "participantes", name: "Participantes", path: "/dashboard/events/create-event/participantes" },
-  { id: "alimentacion", name: "Alimentación", path: "/dashboard/events/create-event/alimentacion" },
-  { id: "recursos", name: "Recursos", path: "/dashboard/events/create-event/recursos" },
 ];
 
 const useTabNavigation = (currentSectionId) => {
   const navigate = useNavigate();
-
-  // Obtener el índice de la sección actual
+  
+  // Obtener índice actual con validación
   const currentIndex = sections.findIndex((section) => section.id === currentSectionId);
+  
+  // Validar que la sección exista
+  if (currentIndex === -1) {
+    console.error(`Sección no encontrada: ${currentSectionId}`);
+    return {
+      goToNextSection: () => {},
+      goToPreviousSection: () => {},
+      showPreviousButton: false,
+      showNextButton: false,
+      isLastSection: false,
+      currentSection: null,
+      sections,
+      progress: { current: 0, total: 0, percentage: 0 },
+      markSectionAsCompleted: () => {},
+      isSectionCompleted: () => false
+    };
+  }
 
-  // Función para navegar a la siguiente sección
-  const goToNextSection = () => {
-    if (currentIndex < sections.length - 1) {
-      const nextSection = sections[currentIndex + 1];
-      navigate(nextSection.path);
-    }
-  };
-
-  // Función para navegar a la sección anterior
-  const goToPreviousSection = () => {
-    if (currentIndex > 0) {
-      const previousSection = sections[currentIndex - 1];
-      navigate(previousSection.path);
-    }
-  };
-
-  // Determinar si el botón "Retroceder" debe mostrarse
-  const showPreviousButton = currentIndex > 0;
-
-  // Determinar si el botón "Siguiente" debe mostrarse
-  const showNextButton = currentIndex < sections.length - 1;
+  // Calcular estados
+  const isLastSection = currentIndex === sections.length - 1;
+  const isFirstSection = currentIndex === 0;
 
   return {
-    goToNextSection,
-    goToPreviousSection,
-    showPreviousButton,
-    showNextButton,
+    goToNextSection: () => {
+      if (!isLastSection) {
+        navigate(sections[currentIndex + 1].path);
+      }
+    },
+    goToPreviousSection: () => {
+      if (!isFirstSection) {
+        navigate(sections[currentIndex - 1].path);
+      }
+    },
+    showPreviousButton: !isFirstSection,
+    showNextButton: !isLastSection,
+    isLastSection,
+    currentSection: sections[currentIndex],
+    sections,
+    progress: {
+      current: currentIndex + 1,
+      total: sections.length,
+      percentage: Math.round(((currentIndex + 1) / sections.length) * 100)
+    },
+    markSectionAsCompleted: () => {
+      const completed = JSON.parse(sessionStorage.getItem('completedSections') || '{}');
+      completed[currentSectionId] = true;
+      sessionStorage.setItem('completedSections', JSON.stringify(completed));
+    },
+    isSectionCompleted: (sectionId) => {
+      const completed = JSON.parse(sessionStorage.getItem('completedSections') || '{}');
+      return !!completed[sectionId];
+    }
   };
 };
 

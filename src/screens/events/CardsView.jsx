@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import ModalEvent from "../../ui/ModalEvent";
-import EventCards from "../../ui/EventCards";
 import { useNavigate } from "react-router-dom";
+import EventCards from "../../components/events/EventCards";
+import ModalEvent from "../../components/events/ModalEvent";
 
 const CardsView = () => {
   const [user, setUser] = useState(null);

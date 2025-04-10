@@ -26,6 +26,7 @@ import {
 
   //Paginas Dashboard
   import HomeDashboard from "../pages/dashboard/home";
+import Reports from "../pages/dashboard/Reports";
   
   const router = createBrowserRouter([
     {
@@ -70,7 +71,7 @@ import {
         },
         {
           path: "reports",
-          element: <h1 className="title">Reportes</h1>,
+          element: <PrivateRoute element={<Reports />} />,
         },
         {
           path: "help",

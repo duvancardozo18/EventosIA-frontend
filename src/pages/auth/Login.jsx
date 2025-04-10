@@ -8,6 +8,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useContext(AuthContext); // Usa la función de login del contexto
   const navigate = useNavigate();
 
@@ -15,6 +16,8 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
+    if (!email.trim() || !password.trim()) return setError("Por favor completa todos los campos");
+    setIsLoading(true);
     try {
       const { data } = await axiosInstance.post('/login', {
         email,
@@ -30,7 +33,7 @@ const Login = () => {
       localStorage.setItem('access_token', data.token);
       login(data.token); // Utiliza la función login del contexto para guardar el token
       //console.log("Token guardado:", data.token);
-      
+
       navigate('/dashboard');
     } catch (err) {
       if (err.response) {
@@ -40,6 +43,8 @@ const Login = () => {
       } else {
         setError('Error desconocido. Intenta de nuevo.');
       }
+    } finally {
+      setIsLoading(false)
     }
   };
 
@@ -59,8 +64,12 @@ const Login = () => {
         {/* Sección de formulario */}
         <div className="w-full lg:w-[50%] flex flex-col items-center justify-center px-2">
           <h1 className="text-4xl font-bold mb-5 text-center">INICIO DE SESIÓN</h1>
+          {error && (
+            <span className="w-[70%] text-sm text-center py-2 mb-2 bg-[#FFA7A9] rounded-lg text-gray-600 flex gap-5 items-center justify-center mx-auto px-5 whitespace-pre-line">
+              {error}
+            </span>
+          )}
 
-          {error && <p className="text-red-500">{error}</p>}
 
           <form className="flex flex-col w-full sm:w-[90%] items-center" onSubmit={handleLogin}>
             <InputItem
@@ -85,7 +94,7 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-[80%] sm:w-[45%] mt-4 bg-[#365486] text-white py-2 px-2 rounded-lg hover:bg-[#344663] hover:scale-105 transition-all duration-300 ease-in-out"
+              className={`w-[80%] sm:w-[45%] mt-4 bg-[#365486] text-white py-2 px-2 rounded-lg transition-all duration-300 ease-in-out ${isLoading ? "opacity-70 cursor-not-allowed" : "hover:bg-[#344663]"}`}
             >
               INICIAR SESIÓN
             </button>

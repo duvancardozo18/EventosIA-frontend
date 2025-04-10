@@ -15,7 +15,7 @@ const VerifyAccount = () => {
     const handleVerify = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`${API_URL}/verify-email/${token}`);
+            const res = await axios.post(`${API_URL}/verify-email/${token}`);
             console.log("Verificación exitosa: ", res.data)
             Swal.fire({
                 title: "Email Verificado",

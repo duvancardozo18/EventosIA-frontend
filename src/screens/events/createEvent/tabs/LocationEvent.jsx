@@ -56,6 +56,31 @@ const LocationEvent = () => {
     }));
   };
 
+  // Función para limpiar todos los datos del formulario en sessionStorage
+  const clearFormData = () => {
+    // Lista de todas las claves de sessionStorage relacionadas con el formulario
+    const formKeysToRemove = [
+      'eventData',
+      'tab_ubicacion_data',
+      'tab_tipoEvento_data',
+      'tab_evento_data', // Si existe alguna otra clave relacionada con el evento
+      // Añade cualquier otra clave de sessionStorage que tu aplicación use para el formulario
+    ];
+    
+    // Eliminar cada clave del sessionStorage
+    formKeysToRemove.forEach(key => {
+      sessionStorage.removeItem(key);
+    });
+    
+    // También actualiza el estado local para reflejar el sessionStorage limpio
+    setLocalData({
+      ubicacion_name: "",
+      ubicacion_description: "",
+      ubicacion_price: null,
+      ubicacion_address: ""
+    });
+  };
+
   const handleSubmit = async () => {
     setIsCreating(true); // Set flag for creating event
     
@@ -110,9 +135,14 @@ const LocationEvent = () => {
   
           // Crear el evento
           await createCompleteEvent(eventData, typeEventData, locationData);
+          
+          // Limpiar todos los datos del formulario del sessionStorage después de crear exitosamente
+          clearFormData();
+          
           toast.success('Evento creado exitosamente!');
-          // navigate(`/dashboard/events/${eventData.id}`); // Redirigir al evento creado
+          navigate(`/dashboard/events/`); // Redirigir al dashboard de eventos
         } catch (error) {
+          console.error('Error al crear el evento:', error);
           toast.error('Ocurrió un error al crear el evento');
         } finally {
           setIsCreating(false);

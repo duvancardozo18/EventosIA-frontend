@@ -39,15 +39,11 @@ const Tabs = ({ sections, currentPath, completed: propCompleted }) => {
             <div key={section.id} className="flex flex-col items-center z-10">
               {/* Indicador circular */}
               <div 
-                onClick={() => handleTabClick(section.path, section.id)}
+                // onClick={() => handleTabClick(section.path, section.id)}
                 className={`flex items-center justify-center w-10 h-10 rounded-full border-2 cursor-pointer transition-colors ${
                   currentIndex >= index
                     ? 'bg-blue-500 border-blue-500 text-white'
                     : 'border-gray-300 bg-white'
-                } ${
-                  tabsCompleted[section.id] 
-                    ? 'border-green-500 bg-green-100 text-green-700'
-                    : ''
                 }`}
               >
                 {index + 1}

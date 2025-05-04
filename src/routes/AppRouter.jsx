@@ -15,8 +15,6 @@ import {
   import Register from "../pages/auth/Register";
   import ResetPassword from "../pages/forgotpassword/ResetPassword";
   import ResetPasswordForm from "../pages/forgotpassword/ResetPasswordForm";
-  //import ParticipantsEvent from "../components/screens/events/eventscreate/form/ParticipantsEvent";
-  //import FeedingEvent from "../components/screens/events/eventscreate/form/FeedingEvent";
 
   import CardsView from "../screens/events/CardsView";
   import Event from "../screens/events/createEvent/tabs/Event";
@@ -86,9 +84,6 @@ import {
             { path: "evento", element: <Event /> },
             { path: "tipoEvento", element: <TypeEvent /> },
             { path: "ubicacion", element: <LocationEvent /> },
-            //{ path: "participantes", element: <ParticipantsEvent /> },
-            //{ path: "alimentacion", element: <FeedingEvent /> },
-            //{ path: "recursos", element: <ResourcesEvent /> },
           ],
 
         },

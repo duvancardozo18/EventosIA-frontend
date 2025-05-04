@@ -122,63 +122,78 @@ export const useEventAPI = () => {
         }
     };
 
-    // Crear evento principal - con los IDs de tipo de evento y ubicación
     const createMainEvent = async (eventData, typeEventId, locationId) => {
         console.group('[Main Event] Creating main event');
         try {
             setIsCreating(true);
-
+    
             console.log('[Main Event] Raw event data:', eventData);
             console.log('[Main Event] Type event ID:', typeEventId);
             console.log('[Main Event] Location ID:', locationId);
-
+    
             const formData = new FormData();
             formData.append('name', eventData.name);
             formData.append('event_state_id', eventData.event_state_id);
             formData.append('user_id_created_by', eventData.user_created_by);
-
-            // Se agrega el tipo de evento y ubicación solo si sus IDs existen
+    
             if (typeEventId) {
                 formData.append('type_of_event_id', typeEventId);
                 console.log('[Main Event] Event type ID added to FormData:', typeEventId);
             }
-
+    
             if (locationId) {
                 formData.append('location_id', locationId);
                 console.log('[Main Event] Location ID added to FormData:', locationId);
             }
-
-            if (eventData.image && typeof eventData.image === 'object') {
-                formData.append('image', eventData.image);
-                console.log('[Main Event] Image attached:', eventData.image.name);
-            } else if (eventData.image && typeof eventData.image === 'string' && eventData.image.startsWith('data:')) {
-                // Convierte base64 a Blob y luego a File si es necesario
-                const base64Response = await fetch(eventData.image);
-                const blob = await base64Response.blob();
-                const file = new File([blob], "image.png", { type: blob.type });
-                formData.append('image', file);
-                console.log('[Main Event] Image attached (converted from base64):', file.name);
+    
+            // Verificación mejorada de la imagen
+            if (eventData.image) {
+                if (eventData.image instanceof File) {
+                    formData.append('image', eventData.image);
+                    console.log('[Main Event] Image attached (File):', eventData.image.name);
+                } else if (typeof eventData.image === 'string' && eventData.image.startsWith('data:')) {
+                    // Convertir base64 a File
+                    const base64Response = await fetch(eventData.image);
+                    const blob = await base64Response.blob();
+                    const file = new File([blob], "event-image.png", { type: blob.type });
+                    formData.append('image', file);
+                    console.log('[Main Event] Image attached (converted from base64):', file.name);
+                } else {
+                    console.warn('[Main Event] Invalid image format:', eventData.image);
+                }
+            } else {
+                console.warn('[Main Event] No image provided');
             }
-
+    
+            // Log del contenido de FormData
             console.log('[Main Event] FormData contents:');
             for (let [key, value] of formData.entries()) {
-                console.log(`${key}:`, key === 'image' ? `File(${value.name})` : value);
+                console.log(`${key}:`, value instanceof File ? `File(${value.name}, ${value.type})` : value);
             }
-
-            // Realizamos la solicitud con axios
-            const response = await axios.post(`${API_URL}/events`, formData, { credentials: 'include' });
-
+    
+            // Configuración correcta para axios con FormData
+            const response = await axios.post(`${API_URL}/events`, formData, {
+                withCredentials: true, // Para incluir credenciales
+                headers: {
+                    // ¡No establecer Content-Type! axios lo hará automáticamente con el boundary correcto
+                }
+            });
+    
             console.log('Event creation response:', response.data);
-
-            // Verificamos que el código de respuesta sea 200 o 201
+    
             if (response.status !== 200 && response.status !== 201) {
                 console.error('Event creation failed:', response.data.message);
                 throw new Error(response.data.message || 'Error al crear el evento');
             }
-
+    
             return response.data;
         } catch (error) {
             console.error('Error creating main event:', error);
+            if (error.response) {
+                console.error('Response data:', error.response.data);
+                console.error('Response status:', error.response.status);
+                console.error('Response headers:', error.response.headers);
+            }
             alert(error.message || 'Error al crear el evento principal');
             throw error;
         } finally {

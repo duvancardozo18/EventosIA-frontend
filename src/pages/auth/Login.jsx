@@ -3,7 +3,7 @@
 import { useState, useContext, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { ArrowLeft, Mail, AlertCircle, Check, Eye, EyeOff } from "lucide-react"
-import axiosInstance from "../../config/axiosInstance"
+import axiosInstance from "../../config/AxiosInstance"
 import { AuthContext } from "../../config/AuthProvider"
 
 const Login = () => {

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import axiosInstance from './axiosInstance';
+import axiosInstance from './AxiosInstance';
 
 // Crear el contexto de autenticación
 export const AuthContext = createContext();

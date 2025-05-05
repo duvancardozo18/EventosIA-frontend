@@ -27,7 +27,8 @@ import {
 
   //Paginas Dashboard
   import HomeDashboard from "../pages/dashboard/home";
-import Reports from "../pages/dashboard/Reports";
+  import Reports from "../pages/dashboard/Reports";
+  import NotificationsPage from "../pages/notifications/NotificationsPage";
   
   const router = createBrowserRouter([
     {
@@ -55,6 +56,10 @@ import Reports from "../pages/dashboard/Reports";
       element: <ResetPasswordForm />,
     },
     {
+      path: "/notifications",
+      element: <PrivateRoute element={<NotificationsPage />} />,
+    },  
+    {
       path: "/dashboard",
       element: <PrivateRoute element={<Layout />} />,
       children: [
@@ -78,7 +83,7 @@ import Reports from "../pages/dashboard/Reports";
         {
           path: "help",
           element: <h1 className="title">Ayuda</h1>,
-        },
+        },      
         {
           path: "events/create-event",
           element: <PrivateRoute element={<CreateEvent />} />,

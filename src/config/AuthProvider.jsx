@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
   // Función para inicializar la autenticación
   const checkBackendStatus = async () => {
     try {
-      const response = await axiosInstance.get("/api") // Ruta de salud del backend
+      const response = await axiosInstance.get("/") // Ruta de salud del backend
       return response.status === 200
     } catch (error) {
       console.error("Error al verificar el estado del backend:", error)
@@ -70,14 +70,7 @@ export const AuthProvider = ({ children }) => {
           setEmail(decodedToken.email || "")
           console.log("ID de usuario establecido:", decodedToken.id_user)
 
-          try {
-            await fetchUserData(decodedToken.email)
-            setIsAuthenticated(true)
-          } catch (error) {
-            console.error("Error al obtener los datos del usuario:", error)
-            setError("Error al cargar los datos del usuario. Por favor, inténtelo de nuevo.")
-            setIsAuthenticated(false)
-          }
+
         } else {
           console.warn("El token es inválido o ha expirado")
           localStorage.removeItem("access_token")
@@ -93,33 +86,7 @@ export const AuthProvider = ({ children }) => {
     initializeAuth()
   }, [])
 
-  // Función para obtener datos del usuario desde el backend
-  const fetchUserData = async (email) => {
-    try {
-      const roleResponse = await axiosInstance.get(`/api/users/${email}`)
-      if (roleResponse.status === 200) {
-        const usuario = roleResponse.data.usuario
-        const { id_role } = usuario
 
-        // Obtener el rol y permisos utilizando el rol_id
-        const roleDetailsResponse = await axiosInstance.get(`/api/roles/${id_role}`)
-        if (roleDetailsResponse.status === 200) {
-          const { role } = roleDetailsResponse.data
-          setRole(role.name)
-          setPermissions(role.permissions)
-        } else {
-          console.error("Error al obtener los detalles del rol:", roleDetailsResponse.status)
-          setError("Error al cargar los detalles del rol. Por favor, inténtelo de nuevo.")
-        }
-      } else {
-        console.error("Error al obtener el rol del usuario:", roleResponse.status)
-        setError("Error al cargar el rol del usuario. Por favor, inténtelo de nuevo.")
-      }
-    } catch (error) {
-      console.error("Error al obtener los datos del usuario-rol:", error)
-      setError("Error al cargar los datos del usuario. Por favor, inténtelo de nuevo.")
-    }
-  }
 
   // Función para manejar el login
   const login = async (token) => {
@@ -134,8 +101,6 @@ export const AuthProvider = ({ children }) => {
         setUserId(decodedToken.id_user)
         console.log("Login - ID de usuario establecido:", decodedToken.id_user)
 
-        setEmail(decodedToken.email || "")
-        await fetchUserData(decodedToken.email)
       }
     } catch (error) {
       console.error("Error durante el login:", error)

@@ -32,7 +32,7 @@ const NotificationItem = ({ notification, onMarkAsRead, onDelete, showActions = 
           </div>
 
           {/* Contenido */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 pr-8">
             <p className={`text-sm ${read_status ? "text-gray-600" : "text-gray-800 font-medium"} line-clamp-2`}>
               {message}
             </p>
@@ -43,9 +43,9 @@ const NotificationItem = ({ notification, onMarkAsRead, onDelete, showActions = 
         </div>
       </div>
 
-      {/* Acciones flotantes */}
+      {/* Acciones flotantes - siempre visibles en móvil */}
       {showActions && (
-        <div className="absolute right-2 top-2 flex items-center gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        <div className="absolute right-2 top-2 flex items-center gap-1 sm:opacity-0 transition-opacity duration-200 sm:group-hover:opacity-100">
           {!read_status && (
             <button
               onClick={() => onMarkAsRead(id_notification)}

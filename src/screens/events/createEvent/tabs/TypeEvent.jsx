@@ -27,15 +27,22 @@ const TypeEvent = () => {
             tipo_maxParticipants: savedData.tipo_maxParticipants || null,
             tipo_videoLink: savedData.tipo_videoLink || "",
             tipo_price: savedData.tipo_price || null,
+            tipo_startDate: savedData.tipo_startDate || "",
             tipo_startTime: savedData.tipo_startTime || "",
+            tipo_endDate: savedData.tipo_endDate || "",
             tipo_endTime: savedData.tipo_endTime || "",
             tipo_mode: savedData.tipo_mode || ""
         };
     });
 
+    // Estados para mostrar/ocultar selectores de fecha y hora
+    const [showStartDate, setShowStartDate] = useState(false);
+    const [showStartTime, setShowStartTime] = useState(false);
+    const [showEndDate, setShowEndDate] = useState(false);
+    const [showEndTime, setShowEndTime] = useState(false);
+
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-
 
     // 5. Efectos secundarios
     useEffect(() => {
@@ -58,18 +65,123 @@ const TypeEvent = () => {
         }));
     };
 
-    // 7. Transformación de datos para el contexto/backend
-    const transformDataForContext = (data) => ({
-        id_type_of_event: null,
-        event_type: data.tipo_mode,
-        description: data.tipo_description,
-        start_time: data.tipo_startTime,
-        end_time: data.tipo_endTime,
-        max_Participants: data.tipo_maxParticipants,
-        video_Conference_Link: data.tipo_videoLink,
-        price: data.tipo_price,
-        category_id: data.tipo_eventType
-    });
+    // Manejador de cambios para fechas y horas, modificado para seguir el patrón móvil
+    const handleDateChange = (value, type) => {
+        if (value) {
+            if (type === "startDate") {
+                // Si ya hay una hora seleccionada, mantenerla
+                let dateObj = new Date(value);
+                
+                // Mantener la hora si ya existe
+                if (localData.tipo_startTime) {
+                    const [hours, minutes] = localData.tipo_startTime.split(':');
+                    dateObj.setHours(Number(hours), Number(minutes));
+                }
+                
+                setLocalData(prev => ({
+                    ...prev,
+                    tipo_startDate: value
+                }));
+                setShowStartDate(false);
+            } 
+            else if (type === "startTime") {
+                setLocalData(prev => ({
+                    ...prev,
+                    tipo_startTime: value
+                }));
+                setShowStartTime(false);
+            } 
+            else if (type === "endDate") {
+                // Si ya hay una hora seleccionada, mantenerla
+                let dateObj = new Date(value);
+                
+                // Mantener la hora si ya existe
+                if (localData.tipo_endTime) {
+                    const [hours, minutes] = localData.tipo_endTime.split(':');
+                    dateObj.setHours(Number(hours), Number(minutes));
+                }
+                
+                setLocalData(prev => ({
+                    ...prev,
+                    tipo_endDate: value
+                }));
+                setShowEndDate(false);
+            } 
+            else if (type === "endTime") {
+                setLocalData(prev => ({
+                    ...prev,
+                    tipo_endTime: value
+                }));
+                setShowEndTime(false);
+            }
+        } else {
+            // Si se cancela la selección
+            if (type === "startDate") setShowStartDate(false);
+            if (type === "startTime") setShowStartTime(false);
+            if (type === "endDate") setShowEndDate(false);
+            if (type === "endTime") setShowEndTime(false);
+        }
+    };
+
+    const formatDateToLocal = (dateStr, timeStr) => {
+        if (!dateStr || !timeStr) return null;
+        
+        try {
+            // Verificar formato básico de fecha (YYYY-MM-DD)
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return null;
+            
+            // Verificar formato básico de hora (HH:MM)
+            if (!/^\d{2}:\d{2}$/.test(timeStr)) return null;
+            
+            const [year, month, day] = dateStr.split('-').map(Number);
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            
+            // Validaciones básicas
+            if (month < 1 || month > 12) return null;
+            if (day < 1 || day > 31) return null;
+            if (hours < 0 || hours > 23) return null;
+            if (minutes < 0 || minutes > 59) return null;
+            
+            // Crear fecha para validación adicional
+            const date = new Date(year, month - 1, day, hours, minutes);
+            
+            // Verificar que la fecha creada coincide con los valores ingresados
+            if (date.getFullYear() !== year || 
+                date.getMonth() + 1 !== month || 
+                date.getDate() !== day) {
+                return null;
+            }
+            
+            return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")} ` +
+                   `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`;
+        } catch (error) {
+            console.error("Error formateando fecha:", error);
+            return null;
+        }
+    };
+    
+    const transformDataForContext = (data) => {
+        // Solo intentar formatear fechas si existen ambos campos
+        const startTime = data.tipo_startDate && data.tipo_startTime 
+            ? formatDateToLocal(data.tipo_startDate, data.tipo_startTime)
+            : null;
+        
+        const endTime = data.tipo_endDate && data.tipo_endTime 
+            ? formatDateToLocal(data.tipo_endDate, data.tipo_endTime)
+            : null;
+        
+        return {
+            id_type_of_event: null,
+            event_type: data.tipo_mode,
+            description: data.tipo_description,
+            start_time: startTime,
+            end_time: endTime,
+            max_Participants: data.tipo_maxParticipants,
+            video_Conference_Link: data.tipo_videoLink || "",
+            price: data.tipo_price,
+            category_id: data.tipo_eventType
+        };
+    };
 
     // 8. Validación del formulario
     const validateForm = () => {
@@ -79,7 +191,13 @@ const TypeEvent = () => {
         if (!localData.tipo_eventType.trim()) newErrors.event_type = "El tipo de evento es obligatorio";
         if (!localData.tipo_mode) newErrors.mode = "La modalidad es obligatoria";
         if (!localData.tipo_description.trim()) newErrors.description = "La descripción es obligatoria";
+        
+        // Validación de fecha y hora de inicio
+        if (!localData.tipo_startDate) newErrors.start_date = "La fecha de inicio es requerida";
         if (!localData.tipo_startTime) newErrors.start_time = "La hora de inicio es requerida";
+        
+        // Validación de fecha y hora de fin
+        if (!localData.tipo_endDate) newErrors.end_date = "La fecha de finalización es requerida";
         if (!localData.tipo_endTime) newErrors.end_time = "La hora de finalización es requerida";
         
         // Validación de videoconferencia para modalidades virtual/híbrido
@@ -91,10 +209,16 @@ const TypeEvent = () => {
             }
         }
         
-        // Validación de fechas
-        if (localData.tipo_startTime && localData.tipo_endTime && 
-            new Date(localData.tipo_startTime) >= new Date(localData.tipo_endTime)) {
-            newErrors.end_time = "Debe ser posterior a la hora de inicio";
+        // Validación de fechas y horas combinadas
+        if (localData.tipo_startDate && localData.tipo_startTime && 
+            localData.tipo_endDate && localData.tipo_endTime) {
+            
+            const startDateTime = new Date(`${localData.tipo_startDate}T${localData.tipo_startTime}`);
+            const endDateTime = new Date(`${localData.tipo_endDate}T${localData.tipo_endTime}`);
+            
+            if (startDateTime >= endDateTime) {
+                newErrors.end_time = "La fecha y hora de fin debe ser posterior a la fecha y hora de inicio";
+            }
         }
         
         // Validación de precio
@@ -152,6 +276,15 @@ const TypeEvent = () => {
                     errors={errors}
                     handleChange={handleChange}
                     handleNumberChange={handleNumberChange}
+                    handleDateChange={handleDateChange}
+                    showStartDate={showStartDate}
+                    setShowStartDate={setShowStartDate}
+                    showStartTime={showStartTime}
+                    setShowStartTime={setShowStartTime}
+                    showEndDate={showEndDate}
+                    setShowEndDate={setShowEndDate}
+                    showEndTime={showEndTime}
+                    setShowEndTime={setShowEndTime}
                 />
             </div>
             

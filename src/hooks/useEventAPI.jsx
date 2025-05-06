@@ -1,9 +1,12 @@
-import axios from "axios"; // Importar axios
+import axios from "axios";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const useEventAPI = () => {
     const API_URL = import.meta.env.VITE_API_URL;
     const [isCreating, setIsCreating] = useState(false);
+    const navigate = useNavigate();
 
     // Función genérica para llamadas API con axios
     const fetchApi = async (endpoint, method = 'GET', body = null, headers = {}) => {
@@ -61,6 +64,8 @@ export const useEventAPI = () => {
             // Log de los datos antes de la transformación
             console.log('[Event Type] Raw data:', typeEventData);
 
+            // Asegúrate de que las fechas estén en el formato correcto
+            // start_time y end_time ya deben venir formateados como 'YYYY-MM-DD HH:MM:SS'
             const transformedData = {
                 id_type_of_event: null,
                 event_type: typeEventData.event_type,
@@ -83,7 +88,7 @@ export const useEventAPI = () => {
             return response.id_type_of_event;
         } catch (error) {
             console.error('Error creating event type:', error);
-            alert(error.message || 'Error al crear el tipo de evento');
+            toast.error(error.message || 'Error al crear el tipo de evento');
             throw error;
         } finally {
             setIsCreating(false);
@@ -114,7 +119,7 @@ export const useEventAPI = () => {
             return response.id_location;
         } catch (error) {
             console.error('Error creating location:', error);
-            alert(error.message || 'Error al crear la ubicación');
+            toast.error(error.message || 'Error al crear la ubicación');
             throw error;
         } finally {
             setIsCreating(false);
@@ -127,65 +132,61 @@ export const useEventAPI = () => {
         console.group('[Main Event] Creating main event');
         try {
             setIsCreating(true);
-
+    
             console.log('[Main Event] Raw event data:', eventData);
             console.log('[Main Event] Type event ID:', typeEventId);
             console.log('[Main Event] Location ID:', locationId);
-
+    
             const formData = new FormData();
             formData.append('name', eventData.name);
             formData.append('event_state_id', eventData.event_state_id);
             formData.append('user_id_created_by', eventData.user_created_by);
-
-            // Se agrega el tipo de evento y ubicación solo si sus IDs existen
+    
+            // Agregar tipo de evento y ubicación solo si existen
             if (typeEventId) {
                 formData.append('type_of_event_id', typeEventId);
                 console.log('[Main Event] Event type ID added to FormData:', typeEventId);
             }
-
+    
             if (locationId) {
                 formData.append('location_id', locationId);
                 console.log('[Main Event] Location ID added to FormData:', locationId);
             }
-
-            if (eventData.image && typeof eventData.image === 'object') {
+    
+            // Verificar si hay imagen y es un File válido
+            if (eventData.image instanceof File) {
                 formData.append('image', eventData.image);
                 console.log('[Main Event] Image attached:', eventData.image.name);
-            } else if (eventData.image && typeof eventData.image === 'string' && eventData.image.startsWith('data:')) {
-                // Convierte base64 a Blob y luego a File si es necesario
-                const base64Response = await fetch(eventData.image);
-                const blob = await base64Response.blob();
-                const file = new File([blob], "image.png", { type: blob.type });
-                formData.append('image', file);
-                console.log('[Main Event] Image attached (converted from base64):', file.name);
+            } else if (eventData.imagePreview) {
+                console.warn('[Main Event] Image is not a File object, only preview exists');
             }
 
+            // Log del contenido de FormData
             console.log('[Main Event] FormData contents:');
             for (let [key, value] of formData.entries()) {
-                console.log(`${key}:`, key === 'image' ? `File(${value.name})` : value);
+                console.log(`${key}:`, value instanceof File ? `File(${value.name})` : value);
             }
-
-            // Realizamos la solicitud con axios
+    
+            // Hacer la solicitud POST
             const response = await axios.post(`${API_URL}/events`, formData, { credentials: 'include' });
-
+    
             console.log('Event creation response:', response.data);
-
-            // Verificamos que el código de respuesta sea 200 o 201
+    
             if (response.status !== 200 && response.status !== 201) {
                 console.error('Event creation failed:', response.data.message);
                 throw new Error(response.data.message || 'Error al crear el evento');
             }
-
+    
             return response.data;
         } catch (error) {
             console.error('Error creating main event:', error);
-            alert(error.message || 'Error al crear el evento principal');
+            toast.error(error.message || 'Error al crear el evento principal');
             throw error;
         } finally {
             setIsCreating(false);
             console.groupEnd();
         }
-    };
+    };    
 
     // Función completa para crear el evento
     const createCompleteEvent = async (eventData, typeEventData, locationData) => {
@@ -210,9 +211,24 @@ export const useEventAPI = () => {
             const event = await createMainEvent(eventData, typeEventId, locationId);
 
             console.log('Event successfully created:', event);
+            
+            // Mostrar notificación de éxito
+            toast.success('Evento creado exitosamente!');
+            
+            // Limpiar los datos almacenados en sessionStorage
+            sessionStorage.removeItem('eventData');
+            sessionStorage.removeItem('tab_tipoEvento_data');
+            sessionStorage.removeItem('tab_ubicacion_data');
+            
+            // Redirigir al listado de eventos después de un breve retraso
+            setTimeout(() => {
+                navigate('/dashboard/events');
+            }, 1500);
+            
             return event;
         } catch (error) {
             console.error('Complete event creation failed:', error);
+            toast.error('Ocurrió un error al crear el evento');
             throw error;
         } finally {
             setIsCreating(false);

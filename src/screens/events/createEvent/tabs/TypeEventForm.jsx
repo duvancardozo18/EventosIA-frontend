@@ -2,13 +2,22 @@ import { useEffect, useState } from 'react';
 import Label from '../../../../components/events/LabelForm';
 import Input from '../../../../components/events/InputForm';
 import DateTimeInput from '../../../../components/events/DateTimeInput';
+import DateTimePicker from '../../../../components/events/DateTimePicker';
 
-const EventTypeForm = ({ 
+const TypeEventForm = ({ 
   localData, 
   errors, 
   handleChange, 
-  handleNumberChange
-
+  handleNumberChange,
+  handleDateChange,
+  showStartDate,
+  setShowStartDate,
+  showStartTime,
+  setShowStartTime,
+  showEndDate,
+  setShowEndDate,
+  showEndTime,
+  setShowEndTime
 }) => {
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
@@ -17,9 +26,9 @@ const EventTypeForm = ({
 
   // 4. Opciones para la modalidad
   const modeOptions = [
-      { value: "virtual", label: "Virtual" },
-      { value: "presencial", label: "Presencial" },
-      { value: "hibrido", label: "Híbrido" },
+    { value: "virtual", label: "Virtual" },
+    { value: "presencial", label: "Presencial" },
+    { value: "hibrido", label: "Híbrido" },
   ];
 
   useEffect(() => {
@@ -41,7 +50,6 @@ const EventTypeForm = ({
 
     fetchCategories();
   }, [API_URL]);
-
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -161,25 +169,73 @@ const EventTypeForm = ({
         </div>
       )}
 
-      {/* Hora de Inicio */}
-      <DateTimeInput
-        id="tipo_startTime"
-        label="Hora de Inicio *"
-        value={localData.tipo_startTime}
-        onChange={(e) => handleChange("tipo_startTime", e.target.value)}
-        error={errors.start_time}
-      />
+      {/* Fecha y Hora de Inicio */}
+      <div className="relative">
+        <DateTimeInput
+          dateId="tipo_startDate"
+          timeId="tipo_startTime"
+          label="Fecha y Hora de Inicio *"
+          dateValue={localData.tipo_startDate}
+          timeValue={localData.tipo_startTime}
+          onDateClick={() => setShowStartDate(true)}
+          onTimeClick={() => setShowStartTime(true)}
+          dateError={errors.start_date}
+          timeError={errors.start_time}
+        />
+        {showStartDate && (
+          <DateTimePicker
+            isOpen={showStartDate}
+            onClose={() => setShowStartDate(false)}
+            onSelect={(value) => handleDateChange(value, "startDate")}
+            initialValue={localData.tipo_startDate}
+            mode="date"
+          />
+        )}
+        {showStartTime && (
+          <DateTimePicker
+            isOpen={showStartTime}
+            onClose={() => setShowStartTime(false)}
+            onSelect={(value) => handleDateChange(value, "startTime")}
+            initialValue={localData.tipo_startTime}
+            mode="time"
+          />
+        )}
+      </div>
 
-      {/* Hora de Finalización */}
-      <DateTimeInput
-        id="tipo_endTime"
-        label="Hora de Finalización *"
-        value={localData.tipo_endTime}
-        onChange={(e) => handleChange("tipo_endTime", e.target.value)}
-        error={errors.end_time}
-      />
+      {/* Fecha y Hora de Finalización */}
+      <div className="relative">
+        <DateTimeInput
+          dateId="tipo_endDate"
+          timeId="tipo_endTime"
+          label="Fecha y Hora de Finalización *"
+          dateValue={localData.tipo_endDate}
+          timeValue={localData.tipo_endTime}
+          onDateClick={() => setShowEndDate(true)}
+          onTimeClick={() => setShowEndTime(true)}
+          dateError={errors.end_date}
+          timeError={errors.end_time}
+        />
+        {showEndDate && (
+          <DateTimePicker
+            isOpen={showEndDate}
+            onClose={() => setShowEndDate(false)}
+            onSelect={(value) => handleDateChange(value, "endDate")}
+            initialValue={localData.tipo_endDate}
+            mode="date"
+          />
+        )}
+        {showEndTime && (
+          <DateTimePicker
+            isOpen={showEndTime}
+            onClose={() => setShowEndTime(false)}
+            onSelect={(value) => handleDateChange(value, "endTime")}
+            initialValue={localData.tipo_endTime}
+            mode="time"
+          />
+        )}
+      </div>
     </div>
   );
 };
 
-export default EventTypeForm;
+export default TypeEventForm;

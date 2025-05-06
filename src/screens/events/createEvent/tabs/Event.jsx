@@ -1,46 +1,49 @@
-import { useState, useEffect } from 'react';
-import { useOutletContext } from "react-router-dom";
+import { useState, useEffect, useContext } from 'react';
 import { HiArrowRight } from "react-icons/hi";
 import Label from '../../../../components/events/LabelForm';
 import Input from '../../../../components/events/InputForm';
 import Dropzone from '../../../../components/events/Dropzone';
 import useTabNavigation from '../../../../hooks/useTabNavigation';
+import { AuthContext } from '../../../../config/AuthProvider';
 
 const Event = () => {
     const { showNextButton, goToNextSection } = useTabNavigation("evento");
+    const { userId } = useContext(AuthContext);
 
     // Recuperar datos previos desde sessionStorage
     const storedData = JSON.parse(sessionStorage.getItem("eventData")) || {};
 
-    // Estado inicial del formulario para la sección de evento
+    // Estado inicial del formulario
     const [localData, setLocalData] = useState({
         name: storedData.name || "",
-        event_state_id: 1, //por defecto es 1 siempre
+        event_state_id: 1,
         type_of_event_id: storedData.type_of_event_id || null,
         location_id: storedData.location_id || null,
-        user_created_by: 3,
-        image: null
+        user_created_by: userId || null,
+        image: null, // Siempre null al inicio, se llenará con el File real
+        imagePreview: storedData.imagePreview || "" // Solo la vista previa
     });
 
-    const [imagePreview, setImagePreview] = useState(storedData.imagePreview || "");
-    const [errors, setErrors] = useState({});
-
+    // Actualiza user_created_by cuando cambia userId
     useEffect(() => {
-        if (storedData.image) {
-            fetch(storedData.image)
-                .then(res => res.blob())
-                .then(blob => {
-                    const file = new File([blob], "image.jpg", { type: blob.type });
-                    setLocalData(prev => ({ ...prev, image: file }));
-                });
+        if (userId) {
+            setLocalData(prev => ({
+                ...prev,
+                user_created_by: userId
+            }));
         }
-    }, []);
+    }, [userId]);
 
     // Manejo de cambios en los campos
     const handleChange = (field, value) => {
         setLocalData(prev => {
             const updatedData = { ...prev, [field]: value };
-            sessionStorage.setItem("eventData", JSON.stringify(updatedData));
+            // Guardamos en sessionStorage sin el File (solo la preview)
+            const dataToStore = {
+                ...updatedData,
+                image: null
+            };
+            sessionStorage.setItem("eventData", JSON.stringify(dataToStore));
             return updatedData;
         });
     };
@@ -49,39 +52,30 @@ const Event = () => {
     const handleImageUpload = (file) => {
         const reader = new FileReader();
         reader.onloadend = () => {
-            setImagePreview(reader.result);
-            setLocalData(prev => {
-                const updatedData = { ...prev, image: file };
-                // Guarda la previsualización pero NO el archivo
-                sessionStorage.setItem("eventData", JSON.stringify({ 
-                    ...updatedData, 
-                    image: null, // No intentes guardar el archivo
-                    imagePreview: reader.result // Solo guarda la previsualización
-                }));
-                return updatedData;
-            });
+            const preview = reader.result;
+            setLocalData(prev => ({
+                ...prev,
+                image: file, // Guardamos el File real en el estado
+                imagePreview: preview // Y la vista previa
+            }));
+            
+            // Guardamos solo la preview en sessionStorage
+            const dataToStore = {
+                ...localData,
+                imagePreview: preview,
+                image: null // No guardamos el File
+            };
+            sessionStorage.setItem("eventData", JSON.stringify(dataToStore));
         };
         reader.readAsDataURL(file);
-    };
-
-    // Validación del formulario
-    const validateForm = () => {
-        const newErrors = {};
-        if (!localData.name.trim()) newErrors.name = "El nombre del evento es obligatorio";
-        if (!localData.image) newErrors.image = "Debes subir una imagen del evento";
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
     };
 
     // Manejo del botón de siguiente
     const handleNext = (e) => {
         e.preventDefault();
-    
-        if (validateForm()) {
-            goToNextSection(); // Solo avanza al siguiente tab
-        }
+        goToNextSection();
     };
-    
+
     return (
         <div className="h-full flex flex-col items-center justify-center">
             <h2 className="text-2xl font-semibold mb-4">Detalles del Evento</h2>
@@ -96,11 +90,8 @@ const Event = () => {
                                 id="name" 
                                 value={localData.name}
                                 onChange={(e) => handleChange("name", e.target.value)}
-                                className={`w-full ${errors.name ? 'border-red-500' : ''}`}
+                                className="w-full"
                             />
-                            {errors.name && (
-                                <p className="text-red-500 text-xs mt-1">{errors.name}</p>
-                            )}
                         </div>
                     </div>
 
@@ -108,13 +99,9 @@ const Event = () => {
                         <Label htmlFor="image">Imagen del Evento</Label>
                         <Dropzone 
                             onFileSelect={handleImageUpload} 
-                            imagePreview={imagePreview}
+                            imagePreview={localData.imagePreview}
                             accept="image/*"
-                            className={errors.image ? 'border-red-500' : ''}
                         />
-                        {errors.image && (
-                            <p className="text-red-500 text-xs mt-1">{errors.image}</p>
-                        )}
                     </div>
                 </div>
             </div>

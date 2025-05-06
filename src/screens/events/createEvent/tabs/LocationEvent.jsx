@@ -57,69 +57,77 @@ const LocationEvent = () => {
   };
 
   const handleSubmit = async () => {
-    setIsCreating(true); // Set flag for creating event
+    setIsCreating(true);
     
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors); // Guardamos los errores si existen
-      setIsCreating(false); // Reset flag
+      setErrors(formErrors);
+      setIsCreating(false);
       toast.error("Por favor completa todos los campos requeridos.");
-      return; // Detener la ejecución si hay errores de validación
+      return;
     }
-
-    // Solo mostrar el modal si los campos son válidos
+  
     const confirmed = await ConfirmationModal.show({
       title: 'Creacion de Evento',
       text: '¿Estás seguro de que deseas crear este evento?',
       confirmButtonText: 'Sí, crear evento',
       icon: 'question',
-      disabled: false  // Solo habilitar cuando la validación es exitosa
+      disabled: false
     });
-
+  
     if (confirmed) {
-        try {
-          const eventData = JSON.parse(sessionStorage.getItem('eventData'));
-          const rawTypeEventData = JSON.parse(sessionStorage.getItem('tab_tipoEvento_data'));
-          const rawLocationData = JSON.parse(sessionStorage.getItem('tab_ubicacion_data'));
-
-            
-          // Transformar correctamente los datos de ubicación
-          const locationData = {
-            name: rawLocationData.ubicacion_name,
-            description: rawLocationData.ubicacion_description,
-            price: rawLocationData.ubicacion_price,
-            address: rawLocationData.ubicacion_address
-          };
+      try {
+        const eventData = JSON.parse(sessionStorage.getItem('eventData'));
+        const rawTypeEventData = JSON.parse(sessionStorage.getItem('tab_tipoEvento_data'));
+        const rawLocationData = JSON.parse(sessionStorage.getItem('tab_ubicacion_data'));
   
-          // Transformar correctamente los datos de tipo de evento
-          const typeEventData = {
-            id_type_of_event: null,
-            event_type: rawTypeEventData.tipo_mode,
-            description: rawTypeEventData.tipo_description,
-            max_Participants: rawTypeEventData.tipo_maxParticipants,
-            video_Conference_Link: rawTypeEventData.tipo_videoLink,
-            price: rawTypeEventData.tipo_price,
-            start_time: rawTypeEventData.tipo_startTime,
-            end_time: rawTypeEventData.tipo_endTime,
-            category_id: rawTypeEventData.tipo_eventType
-          };
+        // Función para combinar fecha y hora correctamente
+        const combineDateTime = (dateStr, timeStr) => {
+          if (!dateStr || !timeStr) return null;
+          return `${dateStr} ${timeStr}:00`;
+        };
   
-          // Verificar en consola que los datos estén correctos
-          console.log('Type Event Data:', typeEventData);
-          console.log('Location Data:', locationData);
+        // Transformar correctamente los datos de ubicación
+        const locationData = {
+          name: rawLocationData.ubicacion_name,
+          description: rawLocationData.ubicacion_description,
+          price: rawLocationData.ubicacion_price,
+          address: rawLocationData.ubicacion_address
+        };
   
-          // Crear el evento
-          await createCompleteEvent(eventData, typeEventData, locationData);
-          toast.success('Evento creado exitosamente!');
-          // navigate(`/dashboard/events/${eventData.id}`); // Redirigir al evento creado
-        } catch (error) {
-          toast.error('Ocurrió un error al crear el evento');
-        } finally {
-          setIsCreating(false);
+        // Transformar CORRECTAMENTE los datos de tipo de evento
+        const typeEventData = {
+          id_type_of_event: null,
+          event_type: rawTypeEventData.tipo_mode,
+          description: rawTypeEventData.tipo_description,
+          max_Participants: rawTypeEventData.tipo_maxParticipants,
+          video_Conference_Link: rawTypeEventData.tipo_videoLink || "",
+          price: rawTypeEventData.tipo_price,
+          start_time: combineDateTime(rawTypeEventData.tipo_startDate, rawTypeEventData.tipo_startTime),
+          end_time: combineDateTime(rawTypeEventData.tipo_endDate, rawTypeEventData.tipo_endTime),
+          category_id: rawTypeEventData.tipo_eventType
+        };
+  
+        console.log('Datos del Tipo de Evento:', typeEventData);
+        console.log('Datos de Ubicación:', locationData);
+  
+        // Validar fechas antes de enviar
+        if (!typeEventData.start_time || !typeEventData.end_time) {
+          throw new Error("Las fechas del evento no son válidas");
         }
-      } else {
-        setIsCreating(false);  // Si el usuario cancela, habilitamos los botones de nuevo
+  
+        await createCompleteEvent(eventData, typeEventData, locationData);
+        toast.success('Evento creado exitosamente!');
+        
+      } catch (error) {
+        console.error('Error al crear el evento:', error);
+        toast.error(error.message || 'Ocurrió un error al crear el evento');
+      } finally {
+        setIsCreating(false);
       }
+    } else {
+      setIsCreating(false);
+    }
   };
 
   const handleNext = async (e) => {

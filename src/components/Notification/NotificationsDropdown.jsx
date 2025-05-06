@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import PropTypes from "prop-types"
 import { Bell, X, Check, ExternalLink, Inbox } from "lucide-react"
 import NotificationItem from "./NotificationItem"
@@ -15,9 +15,11 @@ const NotificationsDropdown = ({
   onMarkAsRead,
   onMarkAllAsRead,
   onDelete,
-  fetchNotifications, // Added fetchNotifications prop
+  fetchNotifications,
 }) => {
   const dropdownRef = useRef(null)
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 0)
+  const [windowHeight, setWindowHeight] = useState(typeof window !== "undefined" ? window.innerHeight : 0)
 
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
@@ -36,20 +38,104 @@ const NotificationsDropdown = ({
     }
   }, [isOpen, onClose])
 
+  // Actualizar el ancho y alto de la ventana cuando cambia
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth)
+      setWindowHeight(window.innerHeight)
+    }
+
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
   // Mostrar solo las 5 notificaciones más recientes
   const recentNotifications = notifications.slice(0, 5)
   const hasUnread = notifications.some((n) => !n.read_status)
 
   if (!isOpen) return null
 
+  // Calcular la altura óptima para mostrar 4 notificaciones completas
+  // Cada notificación tiene aproximadamente 80px de altura (ajustar según el diseño real)
+  // Header: ~48px, Footer: ~48px, Padding: ~16px
+  const calculateOptimalHeight = () => {
+    // Altura base para header, footer y padding
+    const baseHeight = 48 + 48 + 16
+
+    // Altura para 4 notificaciones (ajustar según el diseño real)
+    const notificationHeight = 85 // Altura aproximada de cada notificación
+    const desiredNotificationsToShow = Math.min(4, recentNotifications.length)
+
+    // Calcular altura total deseada
+    const desiredHeight = baseHeight + notificationHeight * desiredNotificationsToShow
+
+    // Limitar la altura máxima en dispositivos móviles
+    if (windowWidth < 640) {
+      return Math.min(desiredHeight, windowHeight - 70)
+    }
+
+    // Para pantallas más grandes
+    return Math.min(desiredHeight, 480) // Máximo 480px de altura
+  }
+
+  // Determinar el estilo de posicionamiento basado en el ancho de la ventana
+  const getDropdownStyles = () => {
+    const optimalHeight = calculateOptimalHeight()
+
+    // Para dispositivos móviles pequeños (menos de 640px)
+    if (windowWidth < 640) {
+      return {
+        position: "fixed",
+        top: "60px", // Ajusta según la altura de tu barra de navegación
+        left: "0",
+        right: "0",
+        width: "100%",
+        maxWidth: "100%",
+        margin: "0 auto",
+        height: optimalHeight,
+        maxHeight: "calc(100vh - 70px)",
+        borderRadius: "0",
+        zIndex: 50,
+      }
+    }
+
+    // Para tablets (640px - 768px)
+    if (windowWidth < 768) {
+      return {
+        position: "absolute",
+        top: "calc(100% + 8px)",
+        right: "0",
+        width: "320px",
+        maxWidth: "calc(100vw - 32px)",
+        height: optimalHeight,
+        maxHeight: optimalHeight,
+        zIndex: 50,
+      }
+    }
+
+    // Para pantallas más grandes
+    return {
+      position: "absolute",
+      top: "calc(100% + 8px)",
+      right: "0",
+      width: "384px", // w-96
+      maxWidth: "calc(100vw - 32px)",
+      height: optimalHeight,
+      maxHeight: optimalHeight,
+      zIndex: 50,
+    }
+  }
+
+  const dropdownStyles = getDropdownStyles()
+
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 top-full mt-2 w-96 max-w-[calc(100vw-2rem)] animate-fadeIn overflow-hidden rounded-xl bg-white shadow-xl ring-1 ring-black/5"
-      style={{ maxHeight: "calc(100vh - 100px)" }}
+      className="animate-fadeIn overflow-hidden bg-white shadow-xl ring-1 ring-black/5 rounded-b-xl sm:rounded-xl flex flex-col"
+      style={dropdownStyles}
     >
       {/* Header */}
-      <div className="flex items-center justify-between border-b bg-gradient-to-r from-[#365486] to-[#4a6da8] px-4 py-3 text-white">
+      <div className="flex items-center justify-between border-b bg-gradient-to-r from-[#365486] to-[#4a6da8] px-4 py-2.5 text-white">
         <h3 className="flex items-center gap-2 font-medium">
           <Bell size={16} />
           <span>Notificaciones</span>
@@ -65,7 +151,7 @@ const NotificationsDropdown = ({
               title="Marcar todas como leídas"
             >
               <Check size={14} />
-              <span>Marcar todas</span>
+              <span className="hidden sm:inline">Marcar todas</span>
             </button>
           )}
           <button
@@ -79,7 +165,7 @@ const NotificationsDropdown = ({
       </div>
 
       {/* Content */}
-      <div className="flex max-h-[400px] flex-col overflow-y-auto">
+      <div className="flex flex-col overflow-y-auto flex-grow">
         {loading ? (
           <div className="flex items-center justify-center p-6">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#365486] border-t-transparent"></div>
@@ -116,18 +202,20 @@ const NotificationsDropdown = ({
                 notification={notification}
                 onMarkAsRead={onMarkAsRead}
                 onDelete={onDelete}
+                showActions={true}
               />
             ))}
           </div>
         )}
       </div>
 
-      {/* Footer */}
+      {/* Footer - Aseguramos que siempre aparezca si hay notificaciones */}
       {notifications.length > 0 && (
-        <div className="border-t bg-gray-50 p-3">
+        <div className="border-t bg-gray-50 p-2.5 mt-auto">
           <Link
             to="/notifications"
-            className="flex w-full items-center justify-center gap-1.5 rounded-md bg-[#365486]/10 px-4 py-2 text-sm font-medium text-[#365486] transition-colors hover:bg-[#365486]/15"
+            className="flex w-full items-center justify-center gap-1.5 rounded-md bg-[#365486]/10 px-4 py-1.5 text-sm font-medium text-[#365486] transition-colors hover:bg-[#365486]/15"
+            onClick={onClose}
           >
             <span>Ver todas las notificaciones</span>
             <ExternalLink size={14} />
@@ -165,7 +253,7 @@ NotificationsDropdown.propTypes = {
   onMarkAsRead: PropTypes.func.isRequired,
   onMarkAllAsRead: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
-  fetchNotifications: PropTypes.func, // Added fetchNotifications prop
+  fetchNotifications: PropTypes.func,
 }
 
 export default NotificationsDropdown

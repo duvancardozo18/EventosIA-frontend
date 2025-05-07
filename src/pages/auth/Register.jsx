@@ -243,16 +243,27 @@ const Register = () => {
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-b from-[#d9e6f5] to-[#c5d8ed] flex flex-col items-center justify-center p-4 relative">
-      {/* Botón para volver a la página de inicio */}
+      {/* Barra superior con botón de volver para móviles */}
+      <div className="fixed top-0 left-0 right-0 z-20 bg-white/80 backdrop-blur-sm py-3 px-4 md:hidden">
+        <button
+          onClick={() => (window.location.href = "http://localhost:5173/#home")}
+          className="flex items-center gap-2 text-[#365486] hover:text-[#4a6da8] transition-colors duration-300 font-medium"
+        >
+          <ArrowLeft size={18} />
+          <span>Volver al inicio</span>
+        </button>
+      </div>
+
+      {/* Botón para volver a la página de inicio (solo desktop) */}
       <button
         onClick={() => (window.location.href = "http://localhost:5173/#home")}
-        className="absolute top-6 left-6 flex items-center gap-2 text-[#365486] hover:text-[#4a6da8] transition-colors duration-300 font-medium z-10"
+        className="absolute top-6 left-6 hidden md:flex items-center gap-2 text-[#365486] hover:text-[#4a6da8] transition-colors duration-300 font-medium z-10"
       >
         <ArrowLeft size={20} />
         <span>Volver al inicio</span>
       </button>
 
-      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
+      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl mt-14 md:mt-0">
         <div className="flex flex-col lg:flex-row">
           {/* Sección de imagen */}
           <div className="hidden lg:flex lg:w-2/5 bg-[#f0f5fb] flex-col items-center justify-center border-r border-gray-200 p-6">

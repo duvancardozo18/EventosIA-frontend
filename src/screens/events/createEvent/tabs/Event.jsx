@@ -6,7 +6,7 @@ import Dropzone from '../../../../components/events/Dropzone';
 import useTabNavigation from '../../../../hooks/useTabNavigation';
 import { AuthContext } from '../../../../config/AuthProvider';
 
-// ✅ Función para convertir base64 a archivo File real
+// ✅ Función para convertir base64 a archivo File real (mantenida para referencia)
 const dataURLtoFile = (dataurl, filename) => {
   if (!dataurl) return null;
   const arr = dataurl.split(',');
@@ -34,8 +34,9 @@ const Event = () => {
     type_of_event_id: storedData.type_of_event_id || null,
     location_id: storedData.location_id || null,
     user_created_by: userId || null,
-    image: storedData.imageBase64 ? dataURLtoFile(storedData.imageBase64, 'event-image.png') : null,
-    imagePreview: storedData.imagePreview || ""
+    image: storedData.image || null, // Guardamos la imagen en base64 directamente
+    imagePreview: storedData.imagePreview || "",
+    imageFileName: storedData.imageFileName || "" // Agregamos nombre del archivo para referencia
   });
 
   // Actualizar user_created_by si cambia el contexto
@@ -52,9 +53,7 @@ const Event = () => {
   const handleChange = (field, value) => {
     setLocalData(prev => {
       const updatedData = { ...prev, [field]: value };
-      const dataToStore = { ...updatedData };
-      delete dataToStore.image; // no guardar el File en sessionStorage
-      sessionStorage.setItem("eventData", JSON.stringify(dataToStore));
+      sessionStorage.setItem("eventData", JSON.stringify(updatedData));
       return updatedData;
     });
   };
@@ -65,22 +64,21 @@ const Event = () => {
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      const preview = reader.result;
-
-      // Actualizamos localData con File real + preview
-      setLocalData(prev => ({
-        ...prev,
-        image: file,
-        imagePreview: preview
-      }));
-
-      // Guardamos en sessionStorage solo el base64 y el nombre
-      const dataToStore = {
-        ...localData,
-        imagePreview: preview,
-        imageBase64: preview
-      };
-      sessionStorage.setItem("eventData", JSON.stringify(dataToStore));
+      const base64Data = reader.result;
+      
+      // Actualizamos localData con la imagen en base64 y preview
+      setLocalData(prev => {
+        const updatedData = {
+          ...prev,
+          image: base64Data, // Guardamos directamente el base64
+          imagePreview: base64Data,
+          imageFileName: file.name // Guardamos el nombre del archivo para referencia
+        };
+        
+        // Guardamos en sessionStorage
+        sessionStorage.setItem("eventData", JSON.stringify(updatedData));
+        return updatedData;
+      });
     };
 
     reader.readAsDataURL(file);
@@ -121,7 +119,7 @@ const Event = () => {
             />
             {localData.image && (
               <p className="text-green-600 mt-2">
-                ✓ Archivo guardado: {localData.image.name}
+                ✓ Archivo guardado: {localData.imageFileName}
               </p>
             )}
           </div>

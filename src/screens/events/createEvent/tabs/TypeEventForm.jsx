@@ -1,21 +1,7 @@
 import { useEffect, useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 
 import Label from '../../../../components/events/LabelForm';
 import Input from '../../../../components/events/InputForm';
-
-// 🔧 Utilidad local para convertir hora AM/PM a objeto Date
-const parseTimeTo24hDate = (timeStr) => {
-  if (!timeStr) return null;
-  const [time, period] = timeStr.trim().split(' ');
-  if (!time || !period) return null;
-  let [hours, minutes] = time.split(':').map(Number);
-  if (period.toLowerCase() === 'pm' && hours < 12) hours += 12;
-  if (period.toLowerCase() === 'am' && hours === 12) hours = 0;
-  const date = new Date(1970, 0, 1, hours, minutes);
-  return isNaN(date.getTime()) ? null : date;
-};
 
 const TypeEventForm = ({
   localData,
@@ -174,74 +160,48 @@ const TypeEventForm = ({
 
       {/* Fecha y Hora de Inicio */}
       <div>
-        <Label>Fecha de Inicio *</Label>
-        <DatePicker
-          selected={localData.tipo_startDate ? new Date(localData.tipo_startDate) : null}
-          onChange={(date) => handleChange('tipo_startDate', date.toISOString().split('T')[0])}
-          dateFormat="yyyy-MM-dd"
-          className={`w-full border px-4 py-2.5 text-sm rounded-lg ${
-            errors.start_date ? 'border-red-500' : 'border-gray-300'
-          }`}
+        <Label htmlFor="tipo_startDate">Fecha de Inicio *</Label>
+        <Input
+          type="date"
+          id="tipo_startDate"
+          value={localData.tipo_startDate}
+          onChange={(e) => handleChange('tipo_startDate', e.target.value)}
+          className={`w-full ${errors.start_date ? 'border-red-500' : ''}`}
         />
         {errors.start_date && <p className="text-red-500 text-xs mt-1">{errors.start_date}</p>}
       </div>
       <div>
-        <Label>Hora de Inicio *</Label>
-        <DatePicker
-          selected={parseTimeTo24hDate(localData.tipo_startTime)}
-          onChange={(date) => {
-            const formatted = date.toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: true
-            });
-            handleChange('tipo_startTime', formatted);
-          }}
-          showTimeSelect
-          showTimeSelectOnly
-          timeIntervals={15}
-          timeCaption="Hora"
-          dateFormat="h:mm aa"
-          className={`w-full border px-4 py-2.5 text-sm rounded-lg ${
-            errors.start_time ? 'border-red-500' : 'border-gray-300'
-          }`}
+        <Label htmlFor="tipo_startTime">Hora de Inicio *</Label>
+        <Input
+          type="time"
+          id="tipo_startTime"
+          value={localData.tipo_startTime}
+          onChange={(e) => handleChange('tipo_startTime', e.target.value)}
+          className={`w-full ${errors.start_time ? 'border-red-500' : ''}`}
         />
         {errors.start_time && <p className="text-red-500 text-xs mt-1">{errors.start_time}</p>}
       </div>
 
       {/* Fecha y Hora de Fin */}
       <div>
-        <Label>Fecha de Finalización *</Label>
-        <DatePicker
-          selected={localData.tipo_endDate ? new Date(localData.tipo_endDate) : null}
-          onChange={(date) => handleChange('tipo_endDate', date.toISOString().split('T')[0])}
-          dateFormat="yyyy-MM-dd"
-          className={`w-full border px-4 py-2.5 text-sm rounded-lg ${
-            errors.end_date ? 'border-red-500' : 'border-gray-300'
-          }`}
+        <Label htmlFor="tipo_endDate">Fecha de Finalización *</Label>
+        <Input
+          type="date"
+          id="tipo_endDate"
+          value={localData.tipo_endDate}
+          onChange={(e) => handleChange('tipo_endDate', e.target.value)}
+          className={`w-full ${errors.end_date ? 'border-red-500' : ''}`}
         />
         {errors.end_date && <p className="text-red-500 text-xs mt-1">{errors.end_date}</p>}
       </div>
       <div>
-        <Label>Hora de Finalización *</Label>
-        <DatePicker
-          selected={parseTimeTo24hDate(localData.tipo_endTime)}
-          onChange={(date) => {
-            const formatted = date.toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: true
-            });
-            handleChange('tipo_endTime', formatted);
-          }}
-          showTimeSelect
-          showTimeSelectOnly
-          timeIntervals={15}
-          timeCaption="Hora"
-          dateFormat="h:mm aa"
-          className={`w-full border px-4 py-2.5 text-sm rounded-lg ${
-            errors.end_time ? 'border-red-500' : 'border-gray-300'
-          }`}
+        <Label htmlFor="tipo_endTime">Hora de Finalización *</Label>
+        <Input
+          type="time"
+          id="tipo_endTime"
+          value={localData.tipo_endTime}
+          onChange={(e) => handleChange('tipo_endTime', e.target.value)}
+          className={`w-full ${errors.end_time ? 'border-red-500' : ''}`}
         />
         {errors.end_time && <p className="text-red-500 text-xs mt-1">{errors.end_time}</p>}
       </div>

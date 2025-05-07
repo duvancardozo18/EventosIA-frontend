@@ -7,6 +7,25 @@ import useTabNavigation from '../../../../hooks/useTabNavigation';
 import { toast } from 'react-toastify';
 import ConfirmationModal from '../../../../components/events/ConfirmationModal';
 
+// Función para convertir base64 a archivo File real
+const dataURLtoFile = (dataurl, filename) => {
+  if (!dataurl) return null;
+  try {
+    const arr = dataurl.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename || 'event-image.png', { type: mime });
+  } catch (error) {
+    console.error('Error al convertir base64 a File:', error);
+    return null;
+  }
+};
+
 const LocationEvent = () => {
   const navigate = useNavigate();
   const { goToNextSection, goToPreviousSection, isLastSection } = useTabNavigation("ubicacion");
@@ -81,6 +100,15 @@ const LocationEvent = () => {
         const rawTypeEventData = JSON.parse(sessionStorage.getItem('tab_tipoEvento_data'));
         const rawLocationData = JSON.parse(sessionStorage.getItem('tab_ubicacion_data'));
   
+        // Convertir la imagen base64 a File si existe
+        let eventDataWithFile = { ...eventData };
+        if (eventData.image) {
+          const imageFile = dataURLtoFile(eventData.image, eventData.imageFileName || 'event-image.png');
+          if (imageFile) {
+            eventDataWithFile.image = imageFile;
+          }
+        }
+  
         // Función para combinar fecha y hora correctamente
         const combineDateTime = (dateStr, timeStr) => {
           if (!dateStr || !timeStr) return null;
@@ -93,7 +121,7 @@ const LocationEvent = () => {
           if (period?.toLowerCase() === 'am' && hours === 12) hours = 0;
         
           const date = new Date(Date.UTC(year, month - 1, day, hours, minutes, 0));
-          return date.toISOString(); // ← 👈 Esto da "2025-05-02T01:00:00.000Z"
+          return date.toISOString();
         };        
   
         // Transformar correctamente los datos de ubicación
@@ -119,13 +147,14 @@ const LocationEvent = () => {
   
         console.log('Datos del Tipo de Evento:', typeEventData);
         console.log('Datos de Ubicación:', locationData);
+        console.log('Datos del Evento (con imagen):', eventDataWithFile);
   
         // Validar fechas antes de enviar
         if (!typeEventData.start_time || !typeEventData.end_time) {
           throw new Error("Las fechas del evento no son válidas");
         }
   
-        await createCompleteEvent(eventData, typeEventData, locationData);
+        await createCompleteEvent(eventDataWithFile, typeEventData, locationData);
         toast.success('Evento creado exitosamente!');
         
       } catch (error) {

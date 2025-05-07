@@ -84,8 +84,17 @@ const LocationEvent = () => {
         // Función para combinar fecha y hora correctamente
         const combineDateTime = (dateStr, timeStr) => {
           if (!dateStr || !timeStr) return null;
-          return `${dateStr} ${timeStr}:00`;
-        };
+          const [year, month, day] = dateStr.split('-').map(Number);
+          const [time, period] = timeStr.trim().split(' ');
+          let [hours, minutes] = time.split(':').map(Number);
+        
+          // Convertir AM/PM a 24h
+          if (period?.toLowerCase() === 'pm' && hours < 12) hours += 12;
+          if (period?.toLowerCase() === 'am' && hours === 12) hours = 0;
+        
+          const date = new Date(Date.UTC(year, month - 1, day, hours, minutes, 0));
+          return date.toISOString(); // ← 👈 Esto da "2025-05-02T01:00:00.000Z"
+        };        
   
         // Transformar correctamente los datos de ubicación
         const locationData = {

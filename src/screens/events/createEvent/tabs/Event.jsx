@@ -1,137 +1,145 @@
-import { useState, useEffect } from 'react';
-import { useOutletContext } from "react-router-dom";
+import { useState, useEffect, useContext } from 'react';
 import { HiArrowRight } from "react-icons/hi";
 import Label from '../../../../components/events/LabelForm';
 import Input from '../../../../components/events/InputForm';
 import Dropzone from '../../../../components/events/Dropzone';
 import useTabNavigation from '../../../../hooks/useTabNavigation';
+import { AuthContext } from '../../../../config/AuthProvider';
+
+// ✅ Función para convertir base64 a archivo File real (mantenida para referencia)
+const dataURLtoFile = (dataurl, filename) => {
+  if (!dataurl) return null;
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+};
 
 const Event = () => {
-    const { showNextButton, goToNextSection } = useTabNavigation("evento");
+  const { showNextButton, goToNextSection } = useTabNavigation("evento");
+  const { userId } = useContext(AuthContext);
 
-    // Recuperar datos previos desde sessionStorage
-    const storedData = JSON.parse(sessionStorage.getItem("eventData")) || {};
+  // Recuperar datos del sessionStorage
+  const storedData = JSON.parse(sessionStorage.getItem("eventData")) || {};
 
-    // Estado inicial del formulario para la sección de evento
-    const [localData, setLocalData] = useState({
-        name: storedData.name || "",
-        event_state_id: 1, //por defecto es 1 siempre
-        type_of_event_id: storedData.type_of_event_id || null,
-        location_id: storedData.location_id || null,
-        user_created_by: 3,
-        image: null
+  // Estado inicial del formulario
+  const [localData, setLocalData] = useState({
+    name: storedData.name || "",
+    event_state_id: 1,
+    type_of_event_id: storedData.type_of_event_id || null,
+    location_id: storedData.location_id || null,
+    user_created_by: userId || null,
+    image: storedData.image || null, // Guardamos la imagen en base64 directamente
+    imagePreview: storedData.imagePreview || "",
+    imageFileName: storedData.imageFileName || "" // Agregamos nombre del archivo para referencia
+  });
+
+  // Actualizar user_created_by si cambia el contexto
+  useEffect(() => {
+    if (userId) {
+      setLocalData(prev => ({
+        ...prev,
+        user_created_by: userId
+      }));
+    }
+  }, [userId]);
+
+  // Manejo de cambios en campos de texto
+  const handleChange = (field, value) => {
+    setLocalData(prev => {
+      const updatedData = { ...prev, [field]: value };
+      sessionStorage.setItem("eventData", JSON.stringify(updatedData));
+      return updatedData;
     });
+  };
 
-    const [imagePreview, setImagePreview] = useState(storedData.imagePreview || "");
-    const [errors, setErrors] = useState({});
+  // Manejo de la imagen subida
+  const handleImageUpload = (file) => {
+    if (!file) return;
 
-    useEffect(() => {
-        if (storedData.image) {
-            fetch(storedData.image)
-                .then(res => res.blob())
-                .then(blob => {
-                    const file = new File([blob], "image.jpg", { type: blob.type });
-                    setLocalData(prev => ({ ...prev, image: file }));
-                });
-        }
-    }, []);
-
-    // Manejo de cambios en los campos
-    const handleChange = (field, value) => {
-        setLocalData(prev => {
-            const updatedData = { ...prev, [field]: value };
-            sessionStorage.setItem("eventData", JSON.stringify(updatedData));
-            return updatedData;
-        });
-    };
-
-    // Manejo de la imagen
-    const handleImageUpload = (file) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImagePreview(reader.result);
-            setLocalData(prev => {
-                const updatedData = { ...prev, image: file };
-                // Guarda la previsualización pero NO el archivo
-                sessionStorage.setItem("eventData", JSON.stringify({ 
-                    ...updatedData, 
-                    image: null, // No intentes guardar el archivo
-                    imagePreview: reader.result // Solo guarda la previsualización
-                }));
-                return updatedData;
-            });
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64Data = reader.result;
+      
+      // Actualizamos localData con la imagen en base64 y preview
+      setLocalData(prev => {
+        const updatedData = {
+          ...prev,
+          image: base64Data, // Guardamos directamente el base64
+          imagePreview: base64Data,
+          imageFileName: file.name // Guardamos el nombre del archivo para referencia
         };
-        reader.readAsDataURL(file);
+        
+        // Guardamos en sessionStorage
+        sessionStorage.setItem("eventData", JSON.stringify(updatedData));
+        return updatedData;
+      });
     };
 
-    // Validación del formulario
-    const validateForm = () => {
-        const newErrors = {};
-        if (!localData.name.trim()) newErrors.name = "El nombre del evento es obligatorio";
-        if (!localData.image) newErrors.image = "Debes subir una imagen del evento";
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
+    reader.readAsDataURL(file);
+  };
 
-    // Manejo del botón de siguiente
-    const handleNext = (e) => {
-        e.preventDefault();
-    
-        if (validateForm()) {
-            goToNextSection(); // Solo avanza al siguiente tab
-        }
-    };
-    
-    return (
-        <div className="h-full flex flex-col items-center justify-center">
-            <h2 className="text-2xl font-semibold mb-4">Detalles del Evento</h2>
+  const handleNext = (e) => {
+    e.preventDefault();
+    goToNextSection();
+  };
 
-            <div className="w-full max-w-4xl p-8 bg-white shadow-lg rounded-2xl border border-gray-300">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="md:col-span-2 flex flex-col items-center">
-                        <Label htmlFor="name">Nombre del Evento</Label>
-                        <div className="w-full max-w-md">
-                            <Input 
-                                type="text" 
-                                id="name" 
-                                value={localData.name}
-                                onChange={(e) => handleChange("name", e.target.value)}
-                                className={`w-full ${errors.name ? 'border-red-500' : ''}`}
-                            />
-                            {errors.name && (
-                                <p className="text-red-500 text-xs mt-1">{errors.name}</p>
-                            )}
-                        </div>
-                    </div>
+  return (
+    <div className="h-full flex flex-col items-center justify-center">
+      <h2 className="text-2xl font-semibold mb-4">Detalles del Evento</h2>
 
-                    <div className="md:col-span-2">
-                        <Label htmlFor="image">Imagen del Evento</Label>
-                        <Dropzone 
-                            onFileSelect={handleImageUpload} 
-                            imagePreview={imagePreview}
-                            accept="image/*"
-                            className={errors.image ? 'border-red-500' : ''}
-                        />
-                        {errors.image && (
-                            <p className="text-red-500 text-xs mt-1">{errors.image}</p>
-                        )}
-                    </div>
-                </div>
+      <div className="w-full max-w-4xl p-8 bg-white shadow-lg rounded-2xl border border-gray-300">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Nombre del evento */}
+          <div className="md:col-span-2 flex flex-col items-center">
+            <Label htmlFor="name">Nombre del Evento</Label>
+            <div className="w-full max-w-md">
+              <Input
+                type="text"
+                id="name"
+                value={localData.name}
+                onChange={(e) => handleChange("name", e.target.value)}
+                className="w-full"
+              />
             </div>
+          </div>
 
-            <div className="w-full max-w-4xl flex justify-end mt-6">
-                {showNextButton && (
-                    <button
-                        onClick={handleNext}
-                        className="px-6 py-2.5 bg-blue-600 text-white rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors font-medium"
-                    >
-                        Siguiente
-                        <HiArrowRight className="size-5" />
-                    </button>
-                )}
-            </div>
+          {/* Imagen */}
+          <div className="md:col-span-2">
+            <Label htmlFor="image">Imagen del Evento</Label>
+            <Dropzone
+              onFileSelect={handleImageUpload}
+              imagePreview={localData.imagePreview}
+              accept="image/*"
+            />
+            {localData.image && (
+              <p className="text-green-600 mt-2">
+                ✓ Archivo guardado: {localData.imageFileName}
+              </p>
+            )}
+          </div>
         </div>
-    );
+      </div>
+
+      {/* Botón siguiente */}
+      <div className="w-full max-w-4xl flex justify-end mt-6">
+        {showNextButton && (
+          <button
+            onClick={handleNext}
+            className="px-6 py-2.5 bg-blue-600 text-white rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors font-medium"
+          >
+            Siguiente
+            <HiArrowRight className="size-5" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default Event;

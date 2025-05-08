@@ -29,6 +29,7 @@ import {
   import HomeDashboard from "../pages/dashboard/home";
   import Reports from "../pages/dashboard/Reports";
   import NotificationsPage from "../pages/notifications/NotificationsPage";
+  import EventDetail from "../pages/events/EventDetail";
   
   const router = createBrowserRouter([
     {
@@ -96,6 +97,11 @@ import {
             //{ path: "alimentacion", element: <FeedingEvent /> },
             //{ path: "recursos", element: <ResourcesEvent /> },
           ],
+
+        },
+        {
+          path: "events/detail-events/:id",
+          element: <PrivateRoute element={<EventDetail />} />,
 
         },
       ],

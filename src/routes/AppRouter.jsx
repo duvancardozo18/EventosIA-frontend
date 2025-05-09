@@ -30,6 +30,7 @@ import {
   import Reports from "../pages/dashboard/Reports";
   import NotificationsPage from "../pages/notifications/NotificationsPage";
   import EventDetail from "../pages/events/EventDetail";
+import EventBilling from "../pages/billing/EventBilling";
   
   const router = createBrowserRouter([
     {
@@ -104,6 +105,13 @@ import {
           element: <PrivateRoute element={<EventDetail />} />,
 
         },
+        {
+          
+          path: "events/billing-event/:id",
+          element: <PrivateRoute element={<EventBilling />} />,
+
+        },
+        
       ],
     },
   ]);

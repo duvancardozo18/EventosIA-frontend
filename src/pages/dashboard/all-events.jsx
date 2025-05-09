@@ -287,10 +287,10 @@ const AllEvents = () => {
                         {event.max_participants ? `Máx. ${event.max_participants} participantes` : ""}
                       </span>
                       <a
-                        href={`/dashboard/events/${event.id_event}`}
+                        href={`/dashboard/events/detail-events/${event.id_event}`}
                         className="text-[#365486] hover:text-[#4a6da8] font-medium text-sm"
                       >
-                        Ver detalles →
+                        Ver detalles
                       </a>
                     </div>
                   </div>

@@ -11,7 +11,9 @@ import {
   //Paginas
   import Login from "../pages/auth/Login";
   import Homepage from "../pages/Homepage";
-  import VerifyAccount from "../pages/auth/VerifyAccount";
+  import VerifyAccount from "../pages/auth/VerifyAccount"
+  import VerificationSuccess from "../pages/auth/VerificationSuccess"
+  import VerificationRedirect from "../pages/auth/VerificationRedirect"
   import Register from "../pages/auth/Register";
   import ResetPassword from "../pages/forgotpassword/ResetPassword";
   import ResetPasswordForm from "../pages/forgotpassword/ResetPasswordForm";
@@ -30,7 +32,7 @@ import {
   import Reports from "../pages/dashboard/Reports";
   import NotificationsPage from "../pages/notifications/NotificationsPage";
   import EventDetail from "../pages/events/EventDetail";
-import EventBilling from "../pages/billing/EventBilling";
+  import EventBilling from "../pages/billing/EventBilling";
   
   const router = createBrowserRouter([
     {
@@ -46,15 +48,23 @@ import EventBilling from "../pages/billing/EventBilling";
       element: <Register />,
     },
     {
-      path: "/verify-account",
+      path: "/verify-email/:token",
       element: <VerifyAccount />,
+    },
+    {
+      path: "/verification-success",
+      element: <VerificationSuccess />,
+    },
+    {
+      path: "/verification-redirect",
+      element: <VerificationRedirect />,
     },
     {
       path: "/reset-password",
       element: <ResetPassword />,
     },
     {
-      path: "/reset-password-form",
+      path: "/reset-password-form/:token",
       element: <ResetPasswordForm />,
     },
     {

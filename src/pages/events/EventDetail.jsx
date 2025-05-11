@@ -16,6 +16,7 @@ import {
   FiDollarSign,
   FiPlus
 } from 'react-icons/fi';
+import BackButton from '../../components/BackButton';
 
 const tabs = ['Participantes', 'Recursos', 'Alimentos'];
 
@@ -110,7 +111,7 @@ const EventDetail = () => {
       setShowModal(false); // Cierra el modal tras intento
     }
   };
-  
+
   const handleDeleteEvent = async () => {
     setShowModal(true);
   }
@@ -121,9 +122,11 @@ const EventDetail = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 py-16">
+    <div className="w-full min-h-screen bg-gray-50 py-5">
+      <div className="w-full mb-8">
+        <BackButton label="Volver a eventos" />
+      </div>
       <div className="max-w-6xl mx-auto grid grid-cols-12 gap-8">
-        {/* Imagen */}
         <div className="col-span-12 lg:col-span-5 rounded-2xl overflow-hidden shadow-lg">
           <img
             src={event.image_url[0]}
@@ -306,7 +309,7 @@ const EventDetail = () => {
           )}
         </div>
       </div>
-      <div className="w-full flex gap-10 items-center justify-center mt-10">
+      <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-10 items-center justify-center mt-10">
         <button className='bg-red-500 rounded-xl px-6 py-3 text-xl text-white' onClick={handleDeleteEvent}>Eliminar evento</button>
         <button className='bg-indigo-500 rounded-xl px-6 py-3 text-xl text-white' onClick={handleBIlling}>Facturación</button>
       </div>
@@ -319,7 +322,7 @@ const EventDetail = () => {
 
     </div>
 
-    
+
   );
 };
 

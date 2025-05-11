@@ -31,6 +31,7 @@ import {
   import NotificationsPage from "../pages/notifications/NotificationsPage";
   import EventDetail from "../pages/events/EventDetail";
 import EventBilling from "../pages/billing/EventBilling";
+import PaymentView from "../pages/billing/PaymentView";
   
   const router = createBrowserRouter([
     {
@@ -109,6 +110,12 @@ import EventBilling from "../pages/billing/EventBilling";
           
           path: "events/billing-event/:id",
           element: <PrivateRoute element={<EventBilling />} />,
+
+        },
+        {
+          
+          path: "events/billing-event/:id/payment-view",
+          element: <PrivateRoute element={<PaymentView />} />,
 
         },
         

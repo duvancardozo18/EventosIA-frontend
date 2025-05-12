@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ConfirmationModal from '../../components/ConfirmationModal';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +22,7 @@ const tabs = ['Participantes', 'Recursos', 'Alimentos'];
 
 const EventDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
@@ -98,6 +99,7 @@ const EventDetail = () => {
   const confirmDeleteEvent = async () => {
     try {
       await axios.delete(`${API_URL}/events/${id}`);
+
       Swal.fire({
         title: "Evento eliminado",
         text: "El evento ha sido eliminado correctamente.",
@@ -105,6 +107,7 @@ const EventDetail = () => {
       }).then(() => {
         navigate('/dashboard/events');
       });
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -120,6 +123,15 @@ const EventDetail = () => {
     // Lógica para manejar la facturación
     navigate(`/dashboard/events/billing-event/${id}`);
   }
+
+
+  // Función para navegar a la edición del evento
+  const handleEditEvent = () => {
+    navigate(`/dashboard/events/edit-event/editarEvento`, {
+      state: { eventId: id }
+    });
+  }
+
 
   return (
     <div className="w-full min-h-screen bg-gray-50 py-5">
@@ -182,7 +194,10 @@ const EventDetail = () => {
               </li>
             </ul>
           </div>
-          <button className="mt-8 self-start px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">
+          <button 
+            className="mt-8 self-start px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
+            onClick={handleEditEvent}
+          >
             Editar Ajustes
           </button>
         </div>

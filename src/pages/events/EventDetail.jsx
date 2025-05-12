@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ConfirmationModal from '../../components/ConfirmationModal';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import {
   FiCalendar,
   FiMapPin,
@@ -13,6 +16,7 @@ import {
   FiDollarSign,
   FiPlus
 } from 'react-icons/fi';
+import BackButton from '../../components/BackButton';
 
 const tabs = ['Participantes', 'Recursos', 'Alimentos'];
 
@@ -20,6 +24,7 @@ const EventDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
+  const navigate = useNavigate();
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +34,8 @@ const EventDetail = () => {
   const [dataTab, setDataTab] = useState({ Participantes: null, Recursos: null, Alimentos: null });
   const [loadingTab, setLoadingTab] = useState(false);
   const [errorTab, setErrorTab] = useState('');
+  const [showModal, setShowModal] = useState(false);
+
 
   // Carga detalles generales
   useEffect(() => {
@@ -89,16 +96,34 @@ const EventDetail = () => {
   const fecha = start.toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
   const horario = `${start.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })} – ${end.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`;
 
-  const handleDeleteEvent = async () => {
+  const confirmDeleteEvent = async () => {
     try {
       await axios.delete(`${API_URL}/events/${id}`);
-      alert('Evento eliminado con éxito');
-      // Podría redirigir a la lista de eventos después de eliminar
-      // navigate('/events');
+
+      Swal.fire({
+        title: "Evento eliminado",
+        text: "El evento ha sido eliminado correctamente.",
+        icon: "success"
+      }).then(() => {
+        navigate('/dashboard/events');
+      });
+
     } catch (err) {
       setError(err.message);
+    } finally {
+      setShowModal(false); // Cierra el modal tras intento
     }
+  };
+
+  const handleDeleteEvent = async () => {
+    setShowModal(true);
   }
+
+  const handleBIlling = () => {
+    // Lógica para manejar la facturación
+    navigate(`/dashboard/events/billing-event/${id}`);
+  }
+
 
   // Función para navegar a la edición del evento
   const handleEditEvent = () => {
@@ -107,10 +132,13 @@ const EventDetail = () => {
     });
   }
 
+
   return (
-    <div className="w-full min-h-screen bg-gray-50 py-16">
+    <div className="w-full min-h-screen bg-gray-50 py-5">
+      <div className="w-full mb-8">
+        <BackButton label="Volver a eventos" />
+      </div>
       <div className="max-w-6xl mx-auto grid grid-cols-12 gap-8">
-        {/* Imagen */}
         <div className="col-span-12 lg:col-span-5 rounded-2xl overflow-hidden shadow-lg">
           <img
             src={event.image_url[0]}
@@ -296,11 +324,20 @@ const EventDetail = () => {
           )}
         </div>
       </div>
-      <div className="w-full flex gap-10 items-center justify-center mt-10">
+      <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-10 items-center justify-center mt-10">
         <button className='bg-red-500 rounded-xl px-6 py-3 text-xl text-white' onClick={handleDeleteEvent}>Eliminar evento</button>
-        <button className='bg-indigo-500 rounded-xl px-6 py-3 text-xl text-white'>Facturación</button>
+        <button className='bg-indigo-500 rounded-xl px-6 py-3 text-xl text-white' onClick={handleBIlling}>Facturación</button>
       </div>
+      <ConfirmationModal
+        showModal={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={confirmDeleteEvent}
+        message="¿Estás seguro de que deseas eliminar este evento?"
+      />
+
     </div>
+
+
   );
 };
 

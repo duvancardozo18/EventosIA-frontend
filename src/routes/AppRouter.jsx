@@ -8,6 +8,19 @@ import PrivateRoute from "../config/PrivateRoute";
 
 import Layout from "./layout";
 
+  //Paginas
+  import Login from "../pages/auth/Login";
+  import Homepage from "../pages/Homepage";
+  import VerifyAccount from "../pages/auth/VerifyAccount"
+  import VerificationSuccess from "../pages/auth/VerificationSuccess"
+  import VerificationRedirect from "../pages/auth/VerificationRedirect"
+  import Register from "../pages/auth/Register";
+  import ResetPassword from "../pages/forgotpassword/ResetPassword";
+  import ResetPasswordForm from "../pages/forgotpassword/ResetPasswordForm";
+  //import ParticipantsEvent from "../components/screens/events/eventscreate/form/ParticipantsEvent";
+  //import FeedingEvent from "../components/screens/events/eventscreate/form/FeedingEvent";
+
+
 //Paginas
 import Login from "../pages/auth/Login";
 import Homepage from "../pages/Homepage";
@@ -28,6 +41,57 @@ import EditEvent from "../screens/events/editEvent/EditEvent";
 import EditEventTab from "../screens/events/editEvent/tab/Event";
 import EditTypeEventTab from "../screens/events/editEvent/tab/TypeEvent";
 import EditLocationEventTab from "../screens/events/editEvent/tab/LocationEvent";
+
+  //Paginas Dashboard
+  import HomeDashboard from "../pages/dashboard/home";
+  import Reports from "../pages/dashboard/Reports";
+  import NotificationsPage from "../pages/notifications/NotificationsPage";
+  import EventDetail from "../pages/events/EventDetail";
+  import EventBilling from "../pages/billing/EventBilling";
+  import PaymentView from "../pages/billing/PaymentView";
+  
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Homepage />,
+    },
+    {
+      path: "/login",
+      element: <Login />,
+    },
+    {
+      path: "/register",
+      element: <Register />,
+    },
+    {
+      path: "/verify-email/:token",
+      element: <VerifyAccount />,
+    },
+    {
+      path: "/verification-success",
+      element: <VerificationSuccess />,
+    },
+    {
+      path: "/verification-redirect",
+      element: <VerificationRedirect />,
+    },
+    {
+      path: "/reset-password",
+      element: <ResetPassword />,
+    },
+    {
+      path: "/reset-password-form/:token",
+      element: <ResetPasswordForm />,
+    },
+    {
+      path: "/notifications",
+      element: <PrivateRoute element={<NotificationsPage />} />,
+    },  
+    {
+      path: "/dashboard",
+      element: <PrivateRoute element={<Layout />} />,
+      children: [
+
 
 //Paginas Dashboard
 import HomeDashboard from "../pages/dashboard/home";
@@ -117,6 +181,7 @@ const router = createBrowserRouter([
   },
 ]);
 
+
 function AppRouter() {
   return (
     <AuthProvider>
@@ -126,3 +191,31 @@ function AppRouter() {
 }
 
 export default AppRouter;
+
+        },
+        {
+          
+          path: "events/billing-event/:id",
+          element: <PrivateRoute element={<EventBilling />} />,
+
+        },
+        {
+          
+          path: "events/billing-event/:id/payment-view",
+          element: <PrivateRoute element={<PaymentView />} />,
+
+        },
+        
+      ],
+    },
+  ]);
+  
+  function AppRouter() {
+    return (
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    );
+  }
+  
+  export default AppRouter;

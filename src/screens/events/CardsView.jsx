@@ -224,10 +224,10 @@ const MyEvents = () => {
                 <p className="text-gray-700 line-clamp-2 mb-3">{event.event_type_description || event.description}</p>
                 <div className="flex justify-end">
                   <a
-                    href={`/dashboard/events/${event.id_event}`}
+                    href={`/dashboard/events/detail-events/${event.id_event}`}
                     className="text-[#365486] hover:text-[#4a6da8] font-medium text-sm"
                   >
-                    Ver detalles →
+                    Ver detalles
                   </a>
                 </div>
               </div>

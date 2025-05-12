@@ -13,6 +13,8 @@ const ResetPasswordForm = () => {
   })
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [tokenValid, setTokenValid] = useState(false)
+  const [tokenChecking, setTokenChecking] = useState(true)
   const [passwordValidations, setPasswordValidations] = useState({
     length: false,
     uppercase: false,
@@ -30,11 +32,35 @@ const ResetPasswordForm = () => {
   const navigate = useNavigate()
   const API_URL = import.meta.env.VITE_API_URL
 
+  // Verificar si el token es válido al cargar el componente
   useEffect(() => {
-    if (!token) {
-      setError("Token inválido o expirado. Por favor, solicita un nuevo enlace de recuperación.")
+    const verifyToken = async () => {
+      if (!token) {
+        setTokenValid(false)
+        setTokenChecking(false)
+        setError("Token no proporcionado. Por favor, solicita un nuevo enlace de recuperación.")
+        return
+      }
+
+      try {
+        const response = await axios.get(`${API_URL}/reset-password/${token}`)
+        if (response.status === 200) {
+          setTokenValid(true)
+        }
+      } catch (err) {
+        console.error("Error al verificar el token:", err)
+        setError(
+          err.response?.data?.error ||
+            "Token inválido o expirado. Por favor, solicita un nuevo enlace de recuperación.",
+        )
+        setTokenValid(false)
+      } finally {
+        setTokenChecking(false)
+      }
     }
-  }, [token])
+
+    verifyToken()
+  }, [token, API_URL])
 
   const validatePassword = (password) => {
     const validations = {
@@ -116,8 +142,7 @@ const ResetPasswordForm = () => {
     setLoading(true)
 
     try {
-      const response = await axios.post(`${API_URL}/reset-password/`, {
-        token,
+      const response = await axios.post(`${API_URL}/reset-password/${token}`, {
         newPassword,
       })
 
@@ -162,12 +187,45 @@ const ResetPasswordForm = () => {
         setError("El token es inválido o ha expirado. Por favor, solicita un nuevo enlace de recuperación.")
       } else {
         setError(
-          err.response?.data?.message || "Hubo un problema al actualizar la contraseña. Inténtalo de nuevo más tarde.",
+          err.response?.data?.error || "Hubo un problema al actualizar la contraseña. Inténtalo de nuevo más tarde.",
         )
       }
     } finally {
       setLoading(false)
     }
+  }
+
+  // Mostrar pantalla de carga mientras se verifica el token
+  if (tokenChecking) {
+    return (
+      <div className="w-full min-h-screen bg-gradient-to-b from-[#d9e6f5] to-[#c5d8ed] flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#365486] mx-auto mb-4"></div>
+          <p className="text-gray-600">Verificando enlace de recuperación...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Mostrar error si el token no es válido
+  if (!tokenValid && !tokenChecking) {
+    return (
+      <div className="w-full min-h-screen bg-gradient-to-b from-[#d9e6f5] to-[#c5d8ed] flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 text-center">
+          <div className="text-red-500 mb-4">
+            <AlertCircle size={48} className="mx-auto" />
+          </div>
+          <h2 className="text-xl font-bold text-[#365486] mb-2">Enlace inválido o expirado</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button
+            onClick={() => navigate("/reset-password")}
+            className="bg-[#365486] text-white py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-[#344663]"
+          >
+            Solicitar nuevo enlace
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (

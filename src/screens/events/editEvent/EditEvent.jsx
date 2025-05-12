@@ -30,14 +30,8 @@ const EditEvent = () => {
     evento: {
       id_event: data.id_event,
       event_name: data.event_name,
-      id_event_state: data.id_event_state,
-      state: data.state,
       image_url: data.image_url,
       image: null,
-      imagePreview: data.image_url?.[0] || "",
-      user_id_created_by: data.user_id_created_by,
-      user_name: data.user_name,
-      user_last_name: data.user_last_name
     },
     tipoEvento: {
       id_type_of_event: data.id_type_of_event,

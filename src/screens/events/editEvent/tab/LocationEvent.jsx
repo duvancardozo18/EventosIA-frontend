@@ -91,12 +91,7 @@ const LocationEvent = () => {
     const eventData = {
       id_event: formData?.id_event,
       name: formData.evento?.event_name,
-      event_state_id: formData.evento?.id_event_state,
       image: formData.evento?.image,
-      imagePreview: formData.evento?.imagePreview,
-      imageFileName: formData.evento?.imageFileName,
-      user_id_created_by: formData.evento?.user_id_created_by,
-      state: formData.evento?.state,
     };
 
     // 4. Preparar tipo de evento

@@ -33,6 +33,14 @@ import Layout from "./layout";
   import EditTypeEventTab from "../screens/events/editEvent/tab/TypeEvent";
   import EditLocationEventTab from "../screens/events/editEvent/tab/LocationEvent";
 
+  // Componentes de tabs de eventos
+
+  //participantes
+  import ParticipantList from "../pages/events/participants/ParticipantList";
+  import InviteParticipant from "../pages/events/participants/InviteParticipant";
+  import ParticipantStatus from "../pages/events/participants/ParticipantStatus";
+  import InvitationResponse from "../pages/events/participants/InvitationResponse";
+
   //Paginas Dashboard
   import HomeDashboard from "../pages/dashboard/home";
   import Reports from "../pages/dashboard/Reports";
@@ -69,7 +77,18 @@ import Layout from "./layout";
     {
       path: "/notifications",
       element: <PrivateRoute element={<NotificationsPage />} />,
-    },  
+    },
+
+    {
+      path: "/invitacion/:token",
+      element: <InvitationResponse />
+    },
+
+    {
+      path: "/invitacion/:token/rechazar",
+      element: <InvitationResponse />
+    },
+    
     {
       path: "/dashboard",
       element: <PrivateRoute element={<Layout />} />,
@@ -120,18 +139,34 @@ import Layout from "./layout";
           element: <PrivateRoute element={<EventDetail />} />,
         },
 
-                {
-            
-            path: "events/billing-event/:id",
-            element: <PrivateRoute element={<EventBilling />} />,
+        {
+          path: "events/participants/:id",  // Ruta para la lista de participantes
+          element: <PrivateRoute element={<ParticipantList />} />,
+        },
 
-          },
-          {
-            
-            path: "events/billing-event/:id/payment-view",
-            element: <PrivateRoute element={<PaymentView />} />,
+        {
+          path: "events/:id/participants/:participantId",
+          element: <PrivateRoute element={<ParticipantStatus />} />
+        },
 
-          },
+        {
+          path: "events/invite/:id",
+          element: <PrivateRoute element={<InviteParticipant />} />,
+        },
+
+        {
+          
+          path: "events/billing-event/:id",
+          element: <PrivateRoute element={<EventBilling />} />,
+
+        },
+
+        {
+          
+          path: "events/billing-event/:id/payment-view",
+          element: <PrivateRoute element={<PaymentView />} />,
+
+        },
       ],
     },
   ]);

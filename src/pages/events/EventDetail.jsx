@@ -233,19 +233,19 @@ const EventDetail = () => {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                     <div className="flex items-center">
                       <FiCheckCircle className="text-indigo-600 mr-2" />
-                      <span className="text-gray-700">Confirmados {dataTab.Participantes.filter(u => u.status_name === 'confirmado').length}</span>
+                      <span className="text-gray-700">Confirmados {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'confirmado').length}</span>
                     </div>
                     <div className="flex items-center">
                       <FiClock className="text-indigo-600 mr-2" />
-                      <span className="text-gray-700">Pendientes {dataTab.Participantes.filter(u => u.status_name === 'pendiente').length}</span>
+                      <span className="text-gray-700">Pendientes {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'pendiente').length}</span>
                     </div>
                     <div className="flex items-center">
                       <FiUser className="text-gray-500 mr-2" />
-                      <span className="text-gray-700">Asistió {dataTab.Participantes.filter(u => u.status_name).length}</span>
+                      <span className="text-gray-700">Asistió {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'asistió').length}</span>
                     </div>
                     <div className="flex items-center">
                       <FiXCircle className="text-gray-600 mr-2" />
-                      <span className="text-gray-700">Cancelado {dataTab.Participantes.filter(u => u.status_name === 'cancelado').length}</span>
+                      <span className="text-gray-700">Cancelado {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'cancelado').length}</span>
                     </div>
                   </div>
                   {/* Listado */}
@@ -265,7 +265,12 @@ const EventDetail = () => {
                         </div>
                       </div>
                     ))}
-                    <a href="" className='text-indigo-600 hover:underline font-semibold'>Ver todos</a>
+                    <button
+                      onClick={() => navigate(`/dashboard/events/participants/${id}`)}
+                      className="text-indigo-600 hover:underline font-semibold"
+                    >
+                      Ver todos
+                    </button>
                   </div>
                 </>
               )}

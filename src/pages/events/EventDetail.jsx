@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ConfirmationModal from '../../components/ConfirmationModal';
-import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import {
   FiCalendar,
@@ -24,7 +23,6 @@ const EventDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
-  const navigate = useNavigate();
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);

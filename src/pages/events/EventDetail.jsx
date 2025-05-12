@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   FiCalendar,
@@ -18,6 +18,7 @@ const tabs = ['Participantes', 'Recursos', 'Alimentos'];
 
 const EventDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
   const [event, setEvent] = useState(null);
@@ -92,10 +93,20 @@ const EventDetail = () => {
     try {
       await axios.delete(`${API_URL}/events/${id}`);
       alert('Evento eliminado con éxito');
+      // Podría redirigir a la lista de eventos después de eliminar
+      // navigate('/events');
     } catch (err) {
       setError(err.message);
     }
   }
+
+  // Función para navegar a la edición del evento
+  const handleEditEvent = () => {
+    navigate(`/dashboard/events/edit-event/editarEvento`, {
+      state: { eventId: id }
+    });
+  }
+
   return (
     <div className="w-full min-h-screen bg-gray-50 py-16">
       <div className="max-w-6xl mx-auto grid grid-cols-12 gap-8">
@@ -155,7 +166,10 @@ const EventDetail = () => {
               </li>
             </ul>
           </div>
-          <button className="mt-8 self-start px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">
+          <button 
+            className="mt-8 self-start px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
+            onClick={handleEditEvent}
+          >
             Editar Ajustes
           </button>
         </div>

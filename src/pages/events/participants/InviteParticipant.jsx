@@ -140,8 +140,8 @@ export function InviteParticipant() {
   };
 
   return (
-    <div className="min-h-screen bg-white p-6">
-      <div className="max-w-md mx-auto">
+    <div className="w-full flex justify-center bg-gray-100 p-6 min-h-screen">
+      <div className="w-full max-w-md">
         {/* Header */}
         <div className="mb-6">
           <button 
@@ -154,7 +154,7 @@ export function InviteParticipant() {
         </div>
 
         {/* Content */}
-        <div className="bg-white rounded-lg">
+        <div className="bg-white rounded-xl shadow-md p-8">
           <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">Enviar Invitación</h1>
 
           {error && (

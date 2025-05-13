@@ -13,7 +13,9 @@ import {
   FiXCircle,
   FiUser,
   FiDollarSign,
-  FiPlus
+  FiPlus,
+  FiBox,
+  FiShoppingCart
 } from 'react-icons/fi';
 import BackButton from '../../components/BackButton';
 
@@ -230,7 +232,7 @@ const EventDetail = () => {
               {activeTab === 'Participantes' && dataTab.Participantes && (
                 <>
                   {/* Resumen de estados */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 p-6">
                     <div className="flex items-center">
                       <FiCheckCircle className="text-indigo-600 mr-2" />
                       <span className="text-gray-700">Confirmados {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'confirmado').length}</span>
@@ -249,27 +251,43 @@ const EventDetail = () => {
                     </div>
                   </div>
                   {/* Listado */}
-                  <div className="space-y-4">
-                    {dataTab.Participantes.map(u => (
-                      <div key={u.id} className="flex items-start bg-white p-4 rounded-lg shadow">
-                        <FiUser size={32} className="text-gray-400 mr-4" />
-                        <div className="flex flex-col">
-                          <p className="font-semibold text-gray-900">{u.user_name + u.user_last_name}</p>
-                          <p className="text-sm text-gray-500 mb-2">{u.email}</p>
-                          <div className="flex items-center">
-                            {u.status_name === 'confirmado' && <FiCheckCircle className="text-green-500 mr-1" />}
-                            {u.status_name === 'pendiente' && <FiClock className="text-yellow-500 mr-1" />}
-                            {u.status_name === 'cancelado' && <FiXCircle className="text-red-500 mr-1" />}
-                            <span className="text-sm text-black font-semibold bg-gray-200 rounded-2xl px-3 py-1">{u.status_name}</span>
+                  <div className="space-y-4 max-w-3xl mx-auto">
+                    {dataTab.Participantes.length === 0 ? (
+                    <>
+                      <div className="flex flex-col items-center text-center text-gray-500 space-y-4 py-10">
+                        <FiUser size={48} className="text-gray-400" />
+                        <p className="text-lg font-semibold">No hay participantes</p>
+                        <p className="text-sm">Puedes agregar participantes oprimiendo el botón de abajo "ver todos los participantes".</p>
+                      </div>
+                    </>
+                    ) : (
+                    <>
+                      {dataTab.Participantes.slice(0, 3).map(u => (
+                        <div key={u.id} className="flex items-start bg-white p-4 rounded-lg shadow">
+                          <FiUser size={32} className="text-gray-400 mr-4" />
+                          <div className="flex flex-col">
+                            <p className="font-semibold text-gray-900">{u.user_name + u.user_last_name}</p>
+                            <p className="text-sm text-gray-500 mb-2">{u.email}</p>
+                            <div className="flex items-center">
+                              {u.status_name === 'confirmado' && <FiCheckCircle className="text-green-500 mr-1" />}
+                              {u.status_name === 'pendiente' && <FiClock className="text-yellow-500 mr-1" />}
+                              {u.status_name === 'cancelado' && <FiXCircle className="text-red-500 mr-1" />}
+                              <span className="text-sm text-black font-semibold bg-gray-200 rounded-2xl px-3 py-1">
+                                {u.status_name}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </>
+                    )}
+
+                    {/* Botón siempre visible */}
                     <button
-                      onClick={() => navigate(`/dashboard/events/participants/${id}`)}
-                      className="text-indigo-600 hover:underline font-semibold"
+                    onClick={() => navigate(`/dashboard/events/participants/${id}`)}
+                    className="text-indigo-600 hover:underline font-semibold"
                     >
-                      Ver todos
+                    Ver todos los participantes 
                     </button>
                   </div>
                 </>
@@ -278,51 +296,77 @@ const EventDetail = () => {
               {/* Recursos y Comida siguen igual */}
               {activeTab === 'Recursos' && dataTab.Recursos && (
                 <>
-                  <div className="flex justify-between items-center mb-4">
-                    <a href="#" className="text-indigo-600 hover:underline font-semibold">Ver todos los recursos</a>
-                    <button className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none"><FiPlus size={24} /></button>
+                  <div className="flex justify-between items-center mb-4 p-6">
+                    <a
+                    onClick={() => navigate(`/dashboard/events/detail-events/${id}/resource-list`)}
+                    className="text-indigo-600 hover:underline font-semibold">Ver todos los recursos</a>
+                    <button 
+                    onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-resource`)}
+                    className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
+                      <FiPlus size={24} />
+                    </button>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {dataTab.Recursos.map(r => (
-                      <div key={r.id} className="bg-white p-4 rounded-lg shadow flex justify-between">
-                        <div>
-                          <p className="font-semibold text-gray-900 mb-1">{r.name}</p>
-                          <p className="text-sm text-gray-500">{r.quantity_available} unidades</p>
-                          <p className="text-sm text-gray-500">{r.description}</p>
-                        </div>
-                        <div className="flex items-center justify-between mt-4">
-                          <p className="font-semibold text-indigo-600 flex items-center">
-                            <FiDollarSign className="mr-1" />{Number(r.price).toFixed(2)}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-3">
+                    {dataTab.Recursos.length === 0 ? (
+                      <div className="col-span-full flex flex-col items-center text-center text-gray-500 space-y-4 py-10">
+                        <FiBox size={48} className="text-gray-400" />
+                        <p className="text-lg font-semibold">No hay recursos</p>
+                        <p className="text-sm">Puedes agregar recursos usando el botón de arriba.</p>
+                      </div>
+                    ) : (
+                      dataTab.Recursos.slice(0, 3).map(r => (
+                        <div key={r.id} className="bg-white p-4 rounded-lg shadow flex justify-between">
+                          <div>
+                            <p className="font-semibold text-gray-900 mb-1">{r.name}</p>
+                            <p className="text-sm text-gray-500">{r.quantity_available} unidades</p>
+                            <p className="text-sm text-gray-500">{r.description}</p>
+                          </div>
+                          <div className="flex items-center justify-between mt-4">
+                            <p className="font-semibold text-indigo-600 flex items-center">
+                              <FiDollarSign className="mr-1" />{Number(r.price).toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </>
               )}
 
               {activeTab === 'Alimentos' && dataTab.Alimentos && (
                 <>
-                  <div className="flex justify-between items-center mb-4">
+                  <div className="flex justify-between items-center mb-4 p-6">
                     <a href="#" className="text-indigo-600 hover:underline font-semibold">Ver todos los alimentos</a>
-                    <button className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none"><FiPlus size={24} /></button>
+                    <button className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
+                      <FiPlus size={24} />
+                    </button>
                   </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {dataTab.Alimentos.map(f => (
-                      <div key={f.id} className="bg-white p-4 rounded-lg shadow flex justify-between">
-                        <div>
-                          <p className="font-semibold text-gray-900 mb-1">{f.name}</p>
-                          <p className="text-sm text-gray-500">{f.quantity_available} unidades</p>
-                          <p className="text-sm text-gray-500">{f.description}</p>
-                        </div>
-                        <p className="font-semibold text-indigo-600 flex items-center"><FiDollarSign className="mr-1" />{Number(f.price).toFixed(2)}</p>
+                    {dataTab.Alimentos.length === 0 ? (
+                      <div className="col-span-full flex flex-col items-center text-center text-gray-500 space-y-4 py-10">
+                        <FiShoppingCart size={48} className="text-gray-400" />
+                        <p className="text-lg font-semibold">No hay alimentos</p>
+                        <p className="text-sm">Puedes agregar alimentos usando el botón de arriba.</p>
                       </div>
-                    ))}
+                    ) : (
+                      dataTab.Alimentos.slice(0, 3).map(f => (
+                        <div key={f.id} className="bg-white p-4 rounded-lg shadow flex justify-between">
+                          <div>
+                            <p className="font-semibold text-gray-900 mb-1">{f.name}</p>
+                            <p className="text-sm text-gray-500">{f.quantity_available} unidades</p>
+                            <p className="text-sm text-gray-500">{f.description}</p>
+                          </div>
+                          <p className="font-semibold text-indigo-600 flex items-center">
+                            <FiDollarSign className="mr-1" />{Number(f.price).toFixed(2)}
+                          </p>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </>
               )}
-
             </>
           )}
         </div>

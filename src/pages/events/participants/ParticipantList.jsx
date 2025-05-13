@@ -115,7 +115,7 @@ const handleDelete = async (participantId) => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white rounded-xl">
       {/* Contenido principal */}
       <main className="p-4">
         {error && (

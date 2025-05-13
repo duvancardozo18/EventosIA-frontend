@@ -41,6 +41,11 @@ import Layout from "./layout";
   import ParticipantStatus from "../pages/events/participants/ParticipantStatus";
   import InvitationResponse from "../pages/events/participants/InvitationResponse";
 
+  //Recursos
+  import AddResource from "../pages/events/resources/AddResource";
+  import ResourceList from "../pages/events/resources/ResourceList";
+  import EditResource from "../pages/events/resources/EditResource";
+
   //Paginas Dashboard
   import HomeDashboard from "../pages/dashboard/home";
   import Reports from "../pages/dashboard/Reports";
@@ -134,6 +139,7 @@ import Layout from "./layout";
             { path: "editarUbicacion", element: <EditLocationEventTab /> },
           ],
         },
+
         {
           path: "events/detail-events/:id",
           element: <PrivateRoute element={<EventDetail />} />,
@@ -147,6 +153,21 @@ import Layout from "./layout";
         {
           path: "events/:id/participants/:participantId",
           element: <PrivateRoute element={<ParticipantStatus />} />
+        },
+
+        {
+          path: "events/detail-events/:id/add-resource",
+          element: <PrivateRoute element={<AddResource />} />,
+        },
+
+        {
+          path: "events/detail-events/:id/resource-list",
+          element: <PrivateRoute element={<ResourceList />} />,
+        },
+
+        {
+          path: "events/detail-events/:id/edit-resource/:idResource",
+          element: <PrivateRoute element={<EditResource />} />,
         },
 
         {

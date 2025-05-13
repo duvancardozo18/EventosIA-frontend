@@ -44,6 +44,7 @@ import Layout from "./layout";
   //Recursos
   import AddResource from "../pages/events/resources/AddResource";
   import ResourceList from "../pages/events/resources/ResourceList";
+  import EditResource from "../pages/events/resources/EditResource";
 
   //Paginas Dashboard
   import HomeDashboard from "../pages/dashboard/home";
@@ -162,6 +163,11 @@ import Layout from "./layout";
         {
           path: "events/detail-events/:id/resource-list",
           element: <PrivateRoute element={<ResourceList />} />,
+        },
+
+        {
+          path: "events/detail-events/:id/edit-resource/:idResource",
+          element: <PrivateRoute element={<EditResource />} />,
         },
 
         {

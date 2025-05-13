@@ -337,8 +337,12 @@ const EventDetail = () => {
               {activeTab === 'Alimentos' && dataTab.Alimentos && (
                 <>
                   <div className="flex justify-between items-center mb-4 p-6">
-                    <a href="#" className="text-indigo-600 hover:underline font-semibold">Ver todos los alimentos</a>
-                    <button className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
+                    <a
+                    onClick={() => navigate(`/dashboard/events/detail-events/${id}/food-list`)}
+                    className="text-indigo-600 hover:underline font-semibold">Ver todos los alimentos</a>
+                    <button 
+                    onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-food`)}
+                    className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
                       <FiPlus size={24} />
                     </button>
                   </div>

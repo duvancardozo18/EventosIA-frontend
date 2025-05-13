@@ -46,6 +46,10 @@ import Layout from "./layout";
   import ResourceList from "../pages/events/resources/ResourceList";
   import EditResource from "../pages/events/resources/EditResource";
 
+  //Alimentos
+  import AddFood from "../pages/events/foods/AddFood";
+  import FoodList from "../pages/events/foods/FoodList";
+
   //Paginas Dashboard
   import HomeDashboard from "../pages/dashboard/home";
   import Reports from "../pages/dashboard/Reports";
@@ -145,6 +149,8 @@ import Layout from "./layout";
           element: <PrivateRoute element={<EventDetail />} />,
         },
 
+        //Rutas para tab participantes
+
         {
           path: "events/participants/:id",  // Ruta para la lista de participantes
           element: <PrivateRoute element={<ParticipantList />} />,
@@ -154,6 +160,13 @@ import Layout from "./layout";
           path: "events/:id/participants/:participantId",
           element: <PrivateRoute element={<ParticipantStatus />} />
         },
+        
+        {
+          path: "events/invite/:id",
+          element: <PrivateRoute element={<InviteParticipant />} />,
+        },
+
+        //Rutas para tab de recursos
 
         {
           path: "events/detail-events/:id/add-resource",
@@ -170,9 +183,20 @@ import Layout from "./layout";
           element: <PrivateRoute element={<EditResource />} />,
         },
 
+        //Rutas para tab de alimentos
         {
-          path: "events/invite/:id",
-          element: <PrivateRoute element={<InviteParticipant />} />,
+          path: "events/detail-events/:id/add-food",
+          element: <PrivateRoute element={<AddFood />} />,
+        },
+
+        {
+          path: "events/detail-events/:id/food-list",
+          element: <PrivateRoute element={<FoodList />} />,
+        },
+
+        {
+          path: "events/detail-events/:id/edit-food/:idFood",
+          element: <PrivateRoute element={<EditResource />} />,
         },
 
         {

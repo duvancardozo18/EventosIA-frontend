@@ -1,4 +1,4 @@
-import axiosInstance from "../../../../config/axiosInstance";
+import axiosInstance from "../../../../config/AxiosInstance";
 
 const resourceService = {
   /**

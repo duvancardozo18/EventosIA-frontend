@@ -7,8 +7,6 @@ import Dropzone from "../../../../components/events/Dropzone";
 import useEditTabNavigation from "../../../../hooks/useEditTabNavigation";
 
 const Event = () => {
-  console.log("========== RENDERIZANDO COMPONENTE EVENT ==========");
-  
   const {
     formData,
     updateFormData,
@@ -16,114 +14,57 @@ const Event = () => {
     goToNextSection,
     currentSection
   } = useOutletContext();
-  
-  console.log("Context recibido en Event:", {
-    formDataExists: !!formData,
-    currentSection,
-    eventoData: formData?.evento
-  });
-  
+
   const { showNextButton } = useEditTabNavigation("editarEvento");
-  console.log("showNextButton:", showNextButton);
 
-  // Verificar datos iniciales
   const initialData = formData?.evento || {};
-  console.log("Datos iniciales para el formulario:", initialData);
-  console.log("- event_name:", initialData.event_name);
-  console.log("- id_event_state:", initialData.id_event_state);
-  console.log("- state:", initialData.state);
-  console.log("- imagePreview:", initialData.imagePreview);
 
-  // Estado local sincronizado con los nombres de campos en el componente principal
-  const [localData, setLocalData] = useState(() => {
-    console.log("Inicializando estado local con valores iniciales");
-    return {
-      event_name: initialData.event_name || "",
-      id_event_state: initialData.id_event_state || 1,
-      state: initialData.state || "",
-      image: null, // Solo si el usuario sube una nueva imagen
-      imagePreview: initialData.imagePreview || "", // URL desde image_url[0]
-      imageFileName: initialData.imageFileName || ""
-    };
-  });
-  
-  console.log("Estado local inicializado:", localData);
+  const [localData, setLocalData] = useState(() => ({
+    event_name: initialData.event_name || "",
+    id_event_state: initialData.id_event_state || 1,
+    state: initialData.state || "",
+    image: undefined, // ← importante: no null
+    imagePreview: initialData.imagePreview || initialData.image_url || "",
+    imageFileName: initialData.imageFileName || ""
+  }));
 
-  // Efecto para mantener la sincronización con formData si cambia externamente
   useEffect(() => {
     if (formData?.evento) {
-      console.log("formData.evento cambió, actualizando estado local");
-      console.log("Nuevos datos de formData.evento:", formData.evento);
-      
-      setLocalData(prev => {
-        const updated = {
-          event_name: formData.evento.event_name || prev.event_name,
-          id_event_state: formData.evento.id_event_state || prev.id_event_state,
-          state: formData.evento.state || prev.state,
-          // Mantener la imagen local si existe, de lo contrario usar la del servidor
-          image: prev.image, 
-          imagePreview: prev.image ? prev.imagePreview : formData.evento.imagePreview || prev.imagePreview,
-          imageFileName: prev.imageFileName
-        };
-        
-        console.log("Estado local actualizado:", updated);
-        return updated;
-      });
-    } else {
-      console.log("formData.evento no existe o es null/undefined");
+      setLocalData(prev => ({
+        event_name: formData.evento.event_name || prev.event_name,
+        id_event_state: formData.evento.id_event_state || prev.id_event_state,
+        state: formData.evento.state || prev.state,
+        image: prev.image, // si se cargó una nueva, se conserva
+        imagePreview: prev.image ? prev.imagePreview : formData.evento.imagePreview || formData.evento.image_url || prev.imagePreview,
+        imageFileName: prev.imageFileName
+      }));
     }
   }, [formData]);
 
-  // Manejo de cambios en campos de texto
   const handleChange = (field, value) => {
-    console.log(`Cambiando campo ${field} a:`, value);
-    
-    setLocalData(prev => {
-      const updated = {
-        ...prev,
-        [field]: value
-      };
-      console.log(`Estado local después de cambiar ${field}:`, updated);
-      return updated;
-    });
+    setLocalData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  // Manejo de la imagen subida - adaptado para trabajar con onFileSelect
   const handleImageUpload = (file) => {
-    if (!file) {
-      console.log("No se seleccionó ningún archivo");
-      return;
-    }
+    if (!file) return;
 
-    console.log("Archivo seleccionado:", file.name);
-    
     const reader = new FileReader();
     reader.onloadend = () => {
-      const base64Data = reader.result;
-      console.log("Imagen convertida a base64");
-      
-      setLocalData(prev => {
-        const updated = {
-          ...prev,
-          image: file, // el File real
-          imagePreview: base64Data,
-          imageFileName: file.name
-        };
-        console.log("Estado local actualizado con nueva imagen:", {
-          ...updated,
-          image: "File object (no mostrado)",
-          imagePreview: "Base64 data (truncado)"
-        });
-        return updated;
-      });
+      setLocalData(prev => ({
+        ...prev,
+        image: file,
+        imagePreview: reader.result,
+        imageFileName: file.name
+      }));
     };
 
     reader.readAsDataURL(file);
   };
 
-  // Función para eliminar la imagen
   const handleRemoveImage = () => {
-    console.log("Eliminando imagen");
     setLocalData(prev => ({
       ...prev,
       image: null,
@@ -132,35 +73,29 @@ const Event = () => {
     }));
   };
 
-  // Manejo de navegación a la siguiente pestaña
   const handleNext = (e) => {
     e.preventDefault();
-    console.log("Submit del formulario. Datos actuales:", localData);
+    // Clonar evento original sin campo image si no hay nueva imagen
+    const updated = {
+      ...formData.evento,
+      ...localData
+    };
 
-    // Actualiza los datos en el estado global
-    updateFormData("evento", {
-      ...formData.evento, // <-- preserva los valores existentes (incluye IDs)
-      ...localData        // <-- sobrescribe los que sí estás editando
-    });
+    // 🔥 Forzar eliminación del campo image si NO es un File
+    if (!(localData.image instanceof File)) {
+      delete updated.image;
+    }
 
-
-    // Marca esta sección como completada
-    console.log("Marcando sección 'editarEvento' como completada");
+    updateFormData("evento", updated);
     markSectionCompleted("editarEvento");
-
-    // Navega a la siguiente pestaña
-    console.log("Navegando a la siguiente sección");
     goToNextSection();
   };
-
-  console.log("Renderizando UI del Event component");
 
   return (
     <div className="max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold mb-6">Detalles del Evento</h2>
-      
+
       <form onSubmit={handleNext} className="space-y-6">
-        {/* Nombre del evento */}
         <div className="mb-4">
           <Label htmlFor="event_name" text="Nombre del Evento" />
           <Input
@@ -177,11 +112,9 @@ const Event = () => {
           </div>
         </div>
 
-        {/* Imagen */}
         <div className="mb-4">
           <Label htmlFor="image" text="Imagen del Evento" />
-          
-          {/* Botón para remover la imagen (solo visible cuando hay una imagen) */}
+
           {localData.imagePreview && (
             <div className="mb-2 flex justify-end">
               <button
@@ -195,14 +128,12 @@ const Event = () => {
               </button>
             </div>
           )}
-          
-          {/* Dropzone con vista previa integrada */}
-          <Dropzone 
-            onFileSelect={handleImageUpload} 
+
+          <Dropzone
+            onFileSelect={handleImageUpload}
             imagePreview={localData.imagePreview}
           />
-          
-          {/* Nombre del archivo */}
+
           {localData.imagePreview && (
             <div className="mt-1 text-xs text-gray-500">
               Imagen cargada: {localData.imageFileName || "Imagen del servidor"}
@@ -210,7 +141,6 @@ const Event = () => {
           )}
         </div>
 
-        {/* Botón siguiente */}
         <div className="flex justify-end mt-6">
           {showNextButton && (
             <button

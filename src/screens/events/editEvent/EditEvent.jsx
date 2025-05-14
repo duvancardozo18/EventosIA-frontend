@@ -31,7 +31,8 @@ const EditEvent = () => {
       id_event: data.id_event,
       event_name: data.event_name,
       image_url: data.image_url,
-      image: null,
+      imagePreview: data.image_url,
+      event_state_id: data.id_event_state
     },
     tipoEvento: {
       id_type_of_event: data.id_type_of_event,
@@ -53,6 +54,7 @@ const EditEvent = () => {
       location_price: data.location_price
     }
   });
+  
 
 const hasLoadedRef = useRef(false);
 

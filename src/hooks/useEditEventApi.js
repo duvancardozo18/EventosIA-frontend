@@ -63,16 +63,39 @@ export const useEditEventAPI = () => {
 
   const updateMainEvent = async (eventId, eventData, typeEventId, locationId) => {
     const formData = new FormData();
+
     formData.append('name', eventData.name);
-    formData.append('event_state_id', eventData.event_state_id);
+    
+    if (eventData.event_state_id !== undefined && eventData.event_state_id !== null) {
+      formData.append('event_state_id', eventData.event_state_id);
+    } else {
+      console.warn('[Update Main Event] event_state_id no definido, no se incluye en FormData');
+    }
 
-    if (typeEventId) formData.append('type_of_event_id', typeEventId);
-    if (locationId) formData.append('location_id', locationId);
-    if (eventData.image instanceof File) formData.append('image', eventData.image);
+    if (typeEventId) {
+      formData.append('type_of_event_id', typeEventId);
+    }
 
-    console.group("[Update Main Event]");
+    if (locationId) {
+      formData.append('location_id', locationId);
+    }
+
+    console.log("🔍 Analizando eventData.image antes de agregar a FormData...");
+    console.log("Tipo de image:", typeof eventData.image);
+    console.log("Es instancia de File:", eventData.image instanceof File);
+    console.log("Contenido de image:", eventData.image);
+
+    if (eventData.image instanceof File) {
+      formData.append('image', eventData.image);
+      console.log('[Update Main Event] Imagen modificada incluida:', eventData.image.name);
+    } else if (eventData.image === null || eventData.image === undefined) {
+      console.log('[Update Main Event] Imagen no incluida porque es null/undefined');
+    } else {
+      console.warn('[Update Main Event] ⚠️ Imagen presente pero NO es File. No se incluye.');
+    }
+
+    console.group("[Update Main Event] FormData ENVIADO");
     console.log("Endpoint:", `${API_URL}/events/${eventId}`);
-    console.log("FormData content:");
     for (let [key, value] of formData.entries()) {
       console.log(`${key}:`, value instanceof File ? `File(${value.name})` : value);
     }
@@ -97,23 +120,29 @@ export const useEditEventAPI = () => {
     locationData
   ) => {
     try {
+      console.group("[updateCompleteEvent]");
+      console.log("🧾 Datos recibidos para actualizar el evento:");
+      console.log("eventId:", eventId);
+      console.log("eventData:", eventData);
+      console.log("image:", eventData.image);
+      console.log("originalTypeEventData:", originalTypeEventData);
+      console.log("updatedTypeEventData:", updatedTypeEventData);
+      console.log("locationData:", locationData);
+      console.groupEnd();
+
       let typeEventId = null;
       let locationId = null;
-      let allUpdatesSuccessful = true;
 
-      // Actualizar tipo de evento si hay cambios
       if (updatedTypeEventData && originalTypeEventData?.id_type_of_event) {
         typeEventId = originalTypeEventData.id_type_of_event;
         await updateTypeEvent(typeEventId, updatedTypeEventData);
       }
 
-      // Actualizar ubicación si existe
       if (locationData?.id) {
         await updateLocation(locationData.id, locationData);
         locationId = locationData.id;
       }
 
-      // Actualizar evento principal
       await updateMainEvent(eventId, eventData, typeEventId, locationId);
 
       return { 

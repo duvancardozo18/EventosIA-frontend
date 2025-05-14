@@ -7,7 +7,7 @@ import Swal from "sweetalert2"; // Para mostrar alertas de confirmación y error
 const EditFood = () => {
   const navigate = useNavigate();
   const { id: eventId, idFood: foodId } = useParams();  // Recibimos los parámetros de la ruta
-  console.log("id del alimento:", foodId);
+  console.log("id del alimento:", foodId, );
 
   const [foodData, setFoodData] = useState({
     name: "",
@@ -121,7 +121,7 @@ const EditFood = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">
         <button
           onClick={() => navigate(-1)}

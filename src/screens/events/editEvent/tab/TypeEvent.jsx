@@ -33,11 +33,11 @@ const TypeEvent = () => {
   };
 
   const [localData, setLocalData] = useState({
-    tipo_eventType: initialData.category_id || "",
-    tipo_description: initialData.description || "",
+    tipo_eventType: initialData.id_category || "",
+    tipo_description: initialData.event_type_description || "",
     tipo_maxParticipants: initialData.max_participants ?? null,
     tipo_videoLink: initialData.video_conference_link || "",
-    tipo_price: initialData.price ?? null,
+    tipo_price: initialData.event_price ?? null,
     tipo_startDate: initialData.start_time ? initialData.start_time.slice(0, 10) : "",
     tipo_startTime: initialData.start_time ? formatTo24hInput(initialData.start_time) : "",
     tipo_endDate: initialData.end_time ? initialData.end_time.slice(0, 10) : "",

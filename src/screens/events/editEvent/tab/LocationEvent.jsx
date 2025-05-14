@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import ConfirmationModal from '../../../../components/events/ConfirmationModal';
 import LocationForm from '../../createEvent/tabs/LocationForm';
 import { dataURLtoFile } from '../../../../utils/imageHelperrs';
+import { getFinalImageFile } from '../../../../utils/getFinalImageFile';
 
 const LocationEvent = () => {
   const { goToNextSection, goToPreviousSection, isLastSection } = useEditTabNavigation("editarUbicacion");
@@ -53,90 +54,94 @@ const LocationEvent = () => {
   };
 
   const handleSubmit = async () => {
-  setIsSubmitting(true);
+    setIsSubmitting(true);
 
-  const isValid = validateForm();
-  if (!isValid) {
-    toast.error("Por favor completa todos los campos requeridos.");
-    setIsSubmitting(false);
-    return;
-  }
+    const isValid = validateForm();
+    if (!isValid) {
+      toast.error("Por favor completa todos los campos requeridos.");
+      setIsSubmitting(false);
+      return;
+    }
 
-  const confirmed = await ConfirmationModal.show({
-    title: 'Actualizar Evento',
-    text: '¿Estás seguro de que deseas guardar los cambios?',
-    confirmButtonText: 'Sí, actualizar evento',
-    icon: 'question'
-  });
+    const confirmed = await ConfirmationModal.show({
+      title: 'Actualizar Evento',
+      text: '¿Estás seguro de que deseas guardar los cambios?',
+      confirmButtonText: 'Sí, actualizar evento',
+      icon: 'question'
+    });
 
-  if (!confirmed) {
-    setIsSubmitting(false);
-    return;
-  }
+    if (!confirmed) {
+      setIsSubmitting(false);
+      return;
+    }
 
-  try {
-    // 1. Construir el objeto de ubicación actualizado
-    const updatedUbicacion = {
-      id: formData?.ubicacion?.id_location,
-      name: localData.ubicacion_name,
-      description: localData.ubicacion_description,
-      price: localData.ubicacion_price,
-      address: localData.ubicacion_address
-    };
+    try {
+      // 1. Construir el objeto de ubicación actualizado
+      const updatedUbicacion = {
+        id: formData?.ubicacion?.id_location,
+        name: localData.ubicacion_name,
+        description: localData.ubicacion_description,
+        price: localData.ubicacion_price,
+        address: localData.ubicacion_address
+      };
 
-    // 2. Actualizar el contexto local
-    updateFormData("ubicacion", updatedUbicacion);
+      // 2. Actualizar el contexto local
+      updateFormData("ubicacion", updatedUbicacion);
 
-    // 3. Obtener datos base
-    const eventData = {
-      id_event: formData?.id_event,
-      name: formData.evento?.event_name,
-      image: formData.evento?.image,
-    };
+      const eventData = {
+        id_event: formData?.id_event,
+        name: formData.evento?.event_name,
+        event_state_id: formData.evento?.event_state_id
+      };
 
-    // 4. Preparar tipo de evento
-    const updatedTypeEventData = {
-      id_type_of_event: formData.tipoEvento?.id_type_of_event || null,
-      event_type: formData.tipoEvento?.event_type,
-      description: formData.tipoEvento?.event_type_description,
-      max_participants: formData.tipoEvento?.max_participants,
-      video_conference_link: formData.tipoEvento?.video_conference_link || "",
-      price: formData.tipoEvento?.event_price,
-      category_id: formData.tipoEvento?.id_category,
-      start_time: formData.tipoEvento?.start_time,
-      end_time: formData.tipoEvento?.end_time
-    };
-
-    // 5. Preparar imagen si es base64
-    if (eventData.image && typeof eventData.image === 'string' && eventData.image.startsWith("data:image/")) {
-      const imageFile = dataURLtoFile(eventData.image, eventData.imageFileName || "event-image.png");
-      if (imageFile) {
-        eventData.image = imageFile;
+      // Agregar imagen solo si es un File válido
+      if (formData.evento?.image instanceof File) {
+        eventData.image = formData.evento.image;
       }
+
+      // 4. Preparar tipo de evento
+      const updatedTypeEventData = {
+        id_type_of_event: formData.tipoEvento?.id_type_of_event || null,
+        event_type: formData.tipoEvento?.event_type,
+        description: formData.tipoEvento?.event_type_description,
+        max_participants: formData.tipoEvento?.max_participants,
+        video_conference_link: formData.tipoEvento?.video_conference_link || "",
+        price: formData.tipoEvento?.event_price,
+        category_id: formData.tipoEvento?.id_category,
+        start_time: formData.tipoEvento?.start_time,
+        end_time: formData.tipoEvento?.end_time
+      };
+
+      // 5. Preparar imagen si es base64
+      if (eventData.image && typeof eventData.image === 'string' && eventData.image.startsWith("data:image/")) {
+        const imageFile = dataURLtoFile(eventData.image, eventData.imageFileName || "event-image.png");
+        if (imageFile) {
+          eventData.image = imageFile;
+        }
+      }
+
+      // 6. Ejecutar actualización y redirigir
+      const result = await updateCompleteEvent(
+        formData.id_event,
+        eventData,
+        formData.tipoEvento,
+        updatedTypeEventData,
+        updatedUbicacion
+      );
+
+      // 7. Redirección si todo fue exitoso
+      if (result?.success) {
+        toast.success('Evento actualizado correctamente');
+        navigate(`/dashboard/events/detail-events/${formData.id_event}`);
+      }
+
+    } catch (error) {
+      console.error("Error al actualizar el evento:", error);
+      toast.error(error.message || "Ocurrió un error al actualizar el evento");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // 6. Ejecutar actualización y redirigir
-    const result = await updateCompleteEvent(
-      formData.id_event,
-      eventData,
-      formData.tipoEvento,
-      updatedTypeEventData,
-      updatedUbicacion
-    );
-
-    // 7. Redirección si todo fue exitoso
-    if (result?.success) {
-      toast.success('Evento actualizado correctamente');
-      navigate(`/dashboard/events/detail-events/${formData.id_event}`);
-    }
-
-  } catch (error) {
-    console.error("Error al actualizar el evento:", error);
-    toast.error(error.message || "Ocurrió un error al actualizar el evento");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   const handleNext = async (e) => {
     e.preventDefault();

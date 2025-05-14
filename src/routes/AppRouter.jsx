@@ -49,6 +49,7 @@ import Layout from "./layout";
   //Alimentos
   import AddFood from "../pages/events/foods/AddFood";
   import FoodList from "../pages/events/foods/FoodList";
+  import EditFood from "../pages/events/foods/EditFood";
 
   //Paginas Dashboard
   import HomeDashboard from "../pages/dashboard/home";
@@ -196,7 +197,7 @@ import Layout from "./layout";
 
         {
           path: "events/detail-events/:id/edit-food/:idFood",
-          element: <PrivateRoute element={<EditResource />} />,
+          element: <PrivateRoute element={<EditFood />} />,
         },
 
         {

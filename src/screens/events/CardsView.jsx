@@ -188,51 +188,56 @@ const MyEvents = () => {
           </a>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 ">
+
           {filteredEvents.map((event) => (
-            <div
+            <a
               key={event.id_event}
-              className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
+              href={`/dashboard/events/detail-events/${event.id_event}`}
+              className="block h-full"
+              style={{ textDecoration: "none" }}
             >
-              <div className="h-40 bg-gray-200 relative">
-                {event.image_url && Array.isArray(event.image_url) && event.image_url.length > 0 ? (
-                  <img
-                    src={event.image_url[0] || "/placeholder.svg"}
-                    alt={event.name || event.event_name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : event.image ? (
-                  <img
-                    src={event.image || "/placeholder.svg"}
-                    alt={event.name || event.event_name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-[#f0f5fb]">
-                    <Calendar className="text-[#365486] opacity-50" size={48} />
+              <div
+                className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow hover:scale-105 transition-transform duration-200 h-full cursor-pointer max-w-xs mx-auto "
+              >
+                <div className="h-40 bg-gray-200 relative">
+                  {event.image_url && Array.isArray(event.image_url) && event.image_url.length > 0 ? (
+                    <img
+                      src={event.image_url[0] || "/placeholder.svg"}
+                      alt={event.name || event.event_name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : event.image ? (
+                    <img
+                      src={event.image || "/placeholder.svg"}
+                      alt={event.name || event.event_name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-[#f0f5fb]">
+                      <Calendar className="text-[#365486] opacity-50" size={48} />
+                    </div>
+                  )}
+                  {event.state && (
+                    <div className="absolute top-2 right-2 bg-[#365486] text-white text-xs px-2 py-1 rounded">
+                      {event.state}
+                    </div>
+                  )}
+                </div>
+                <div className="p-4">
+                  <p className="text-[#365486] text-sm font-medium mb-1">{formatDate(event.start_time || event.date)}</p>
+                  <h3 className="font-bold text-lg text-gray-800 mb-2">{event.name || event.event_name}</h3>
+                  <p className="text-gray-700 line-clamp-2 mb-3">{event.event_type_description || event.description}</p>
+                  <div className="flex justify-end">
+                    <span className="text-[#365486] hover:text-[#4a6da8] font-medium text-sm">
+                      Ver detalles
+                    </span>
                   </div>
-                )}
-                {event.state && (
-                  <div className="absolute top-2 right-2 bg-[#365486] text-white text-xs px-2 py-1 rounded">
-                    {event.state}
-                  </div>
-                )}
-              </div>
-              <div className="p-4">
-                <p className="text-[#365486] text-sm font-medium mb-1">{formatDate(event.start_time || event.date)}</p>
-                <h3 className="font-bold text-lg text-gray-800 mb-2">{event.name || event.event_name}</h3>
-                <p className="text-gray-700 line-clamp-2 mb-3">{event.event_type_description || event.description}</p>
-                <div className="flex justify-end">
-                  <a
-                    href={`/dashboard/events/detail-events/${event.id_event}`}
-                    className="text-[#365486] hover:text-[#4a6da8] font-medium text-sm"
-                  >
-                    Ver detalles
-                  </a>
                 </div>
               </div>
-            </div>
+            </a>
           ))}
+
         </div>
       )}
     </div>

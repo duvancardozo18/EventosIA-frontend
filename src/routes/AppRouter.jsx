@@ -73,7 +73,7 @@ import Layout from "./layout";
       element: <Register />,
     },
     {
-      path: "/verify-account",
+      path: "/verify-email/:token",
       element: <VerifyAccount />,
     },
     {

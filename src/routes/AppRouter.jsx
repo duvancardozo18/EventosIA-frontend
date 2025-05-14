@@ -29,7 +29,7 @@ import Layout from "./layout";
 
   // Componentes de edición de eventos
   import EditEvent from "../screens/events/editEvent/EditEvent";
-  import EditEventTab from "../screens/events/editEvent/tab/Event";
+  import EditEventTab from "../screens/events/editEvent/tab/event";
   import EditTypeEventTab from "../screens/events/editEvent/tab/TypeEvent";
   import EditLocationEventTab from "../screens/events/editEvent/tab/LocationEvent";
 

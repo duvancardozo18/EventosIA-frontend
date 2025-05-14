@@ -34,37 +34,41 @@ const Tabs = ({ sections, currentPath, completed: propCompleted }) => {
     <div className="w-full">
       {/* Barra de progreso para pantallas grandes */}
       <div className="relative mb-4 hidden md:block">
-        <div className="flex items-center justify-between">
-          {sections.map((section, index) => (
-            <div key={section.id} className="flex flex-col items-center z-10">
-              {/* Indicador circular */}
-              <div 
-                onClick={() => handleTabClick(section.path, section.id)}
-                className={`flex items-center justify-center w-10 h-10 rounded-full border-2 cursor-pointer transition-colors ${
-                  currentIndex >= index
-                    ? 'bg-blue-500 border-blue-500 text-white'
-                    : 'border-gray-300 bg-white'
-                } ${
-                  tabsCompleted[section.id] 
-                    ? 'border-green-500 bg-green-100 text-green-700'
-                    : ''
-                }`}
-              >
-                {index + 1}
-              </div>
-              
-              {/* Nombre de la sección */}
-              <span className={`mt-2 text-sm ${
-                currentIndex === index ? 'font-bold text-blue-600' : 'text-gray-600'
-              }`}>
-                {section.name}
-              </span>
+        <div className="flex items-center justify-center">
+          <div className="flex-1 max-w-xl mx-auto">
+            <div className="flex items-center justify-between">
+              {sections.map((section, index) => (
+                <div key={section.id} className="flex flex-col items-center z-10">
+                  {/* Indicador circular */}
+                  <div 
+                    onClick={() => handleTabClick(section.path, section.id)}
+                    className={`flex items-center justify-center w-10 h-10 rounded-full border-2 cursor-pointer transition-colors ${
+                      currentIndex >= index
+                        ? 'bg-blue-500 border-blue-500 text-white'
+                        : 'border-gray-300 bg-white'
+                    } ${
+                      tabsCompleted[section.id] 
+                        ? 'border-blue-500 blue-100 text-blue-500'
+                        : ''
+                    }`}
+                  >
+                    {index + 1}
+                  </div>
+                  
+                  {/* Nombre de la sección */}
+                  <span className={`mt-2 text-sm ${
+                    currentIndex === index ? 'font-bold text-blue-600' : 'text-gray-600'
+                  }`}>
+                    {section.name}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
         
         {/* Línea de progreso */}
-        <div className="absolute top-5 left-0 right-0 h-1 bg-gray-200 -z-10">
+        <div className="absolute top-5 left-1/2 -translate-x-1/2 w-full max-w-xl mx-auto h-1 bg-gray-200 -z-10">
           <div 
             className="h-full bg-blue-500 transition-all duration-300" 
             style={{
@@ -88,7 +92,7 @@ const Tabs = ({ sections, currentPath, completed: propCompleted }) => {
                     : 'border-gray-300 bg-white'
                 } ${
                   tabsCompleted[section.id] 
-                    ? 'border-green-500 bg-green-100 text-green-700'
+                    ? 'border-blue-500 blue-100 text-blue-500'
                     : ''
                 }`}
               >

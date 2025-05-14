@@ -41,7 +41,8 @@ const CreateEvent = () => {
 
   return (
     <div className="w-full min-h-screen flex flex-col">
-      <div className="sticky top-0 z-10 bg-white shadow-md p-4">
+      <div className=" top-0 z-10  p-4">
+        <h1 className="text-2xl font-bold mb-4 text-center">Creación de evento</h1>
         <Tabs 
           sections={sections} 
           currentPath={location.pathname.split('/').pop()}

@@ -93,38 +93,40 @@ const Event = () => {
     <div className="h-full flex flex-col items-center justify-center">
       <h2 className="text-2xl font-semibold mb-4">Detalles del Evento</h2>
 
-      <div className="w-full max-w-4xl p-8 bg-white shadow-lg rounded-2xl border border-gray-300">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Nombre del evento */}
-          <div className="md:col-span-2 flex flex-col items-center">
-            <Label htmlFor="name">Nombre del Evento</Label>
-            <div className="w-full max-w-md">
-              <Input
-                type="text"
-                id="name"
-                value={localData.name}
-                onChange={(e) => handleChange("name", e.target.value)}
-                className="w-full"
+
+        <div className="w-full max-w-4xl p-8 bg-white shadow-lg rounded-2xl border border-gray-300">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Nombre del evento a la izquierda */}
+            <div className="flex flex-col items-center md:items-start">
+              <Label htmlFor="name">Nombre del Evento</Label>
+              <div className="w-full max-w-md">
+                <Input
+                  type="text"
+                  id="name"
+                  value={localData.name}
+                  onChange={(e) => handleChange("name", e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            {/* Imagen a la derecha */}
+            <div className="flex flex-col items-center md:items-start">
+              <Label htmlFor="image">Imagen del Evento</Label>
+              <Dropzone
+                onFileSelect={handleImageUpload}
+                imagePreview={localData.imagePreview}
+                accept="image/*"
               />
+              {localData.image && (
+                <p className="text-green-600 mt-2">
+                  ✓ Archivo guardado: {localData.imageFileName}
+                </p>
+              )}
             </div>
           </div>
-
-          {/* Imagen */}
-          <div className="md:col-span-2">
-            <Label htmlFor="image">Imagen del Evento</Label>
-            <Dropzone
-              onFileSelect={handleImageUpload}
-              imagePreview={localData.imagePreview}
-              accept="image/*"
-            />
-            {localData.image && (
-              <p className="text-green-600 mt-2">
-                ✓ Archivo guardado: {localData.imageFileName}
-              </p>
-            )}
-          </div>
         </div>
-      </div>
+
 
       {/* Botón siguiente */}
       <div className="w-full max-w-4xl flex justify-end mt-6">

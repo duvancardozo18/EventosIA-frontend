@@ -4,8 +4,8 @@ import Tabs from "./tabs/Tabs";
 
 // Configuración de secciones
 const sections = [
-  { id: "evento", name: "Evento", path: "evento" },
-  { id: "tipoEvento", name: "Tipo Evento", path: "tipoEvento" },
+  { id: "evento", name: "Detalles", path: "evento" },
+  { id: "tipoEvento", name: "Logistica", path: "tipoEvento" },
   { id: "ubicacion", name: "Ubicación", path: "ubicacion" }
 ];
 
@@ -42,7 +42,7 @@ const CreateEvent = () => {
   return (
     <div className="w-full min-h-screen flex flex-col">
       <div className=" top-0 z-10  p-4">
-        <h1 className="text-2xl font-bold mb-4 text-center">Creación de evento</h1>
+        <h1 className="text-2xl font-bold mb-8 text-center">Creación de evento</h1>
         <Tabs 
           sections={sections} 
           currentPath={location.pathname.split('/').pop()}

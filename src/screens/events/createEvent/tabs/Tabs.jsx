@@ -56,7 +56,7 @@ const Tabs = ({ sections, currentPath, completed: propCompleted }) => {
                   </div>
                   
                   {/* Nombre de la sección */}
-                  <span className={`mt-2 text-sm ${
+                  <span className={`mt-2 text-lg ${
                     currentIndex === index ? 'font-bold text-blue-600' : 'text-gray-600'
                   }`}>
                     {section.name}

@@ -188,7 +188,7 @@ const LocationEvent = () => {
 
   return (
     <div className="h-full flex flex-col items-center justify-center">
-      <h2 className="text-2xl font-semibold mb-4">Ubicación del Evento</h2>
+     
 
       <div className="w-full max-w-4xl p-8 bg-white shadow-lg rounded-2xl border border-gray-300">
         <LocationForm 

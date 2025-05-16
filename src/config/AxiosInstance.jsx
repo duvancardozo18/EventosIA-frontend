@@ -6,7 +6,7 @@ const axiosInstance = axios.create({
     "Content-Type": "application/json",
   },
   // Importante: Configurar withCredentials para enviar cookies con las solicitudes
-  withCredentials: true,
+  //withCredentials: true,
 })
 
 // Interceptor de solicitud para agregar el token de autenticación

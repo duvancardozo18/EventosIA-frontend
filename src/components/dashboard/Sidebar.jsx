@@ -15,9 +15,16 @@ const filterLinksByRole = (links, role) => {
     }));
 };
 
-export const Sidebar = forwardRef(({ collapsed }, ref) => {
+export const Sidebar = forwardRef(({ collapsed, onItemClick }, ref) => {
     const { role } = useContext(AuthContext);
     const filteredLinks = filterLinksByRole(navbarLinks, role);
+
+    const handleItemClick = () => {
+        // Solo colapsar en dispositivos móviles
+        if (window.innerWidth < 768) {
+            onItemClick?.();
+        }
+    };
 
     return (
         <aside
@@ -44,6 +51,7 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
                                 key={link.label}
                                 to={link.path}
                                 className={cn("sidebar-item", collapsed && "md:w-[45px]")}
+                                onClick={handleItemClick}
                             >
                                 <link.icon
                                     size={22}
@@ -63,4 +71,5 @@ Sidebar.displayName = "Sidebar";
 
 Sidebar.propTypes = {
     collapsed: PropTypes.bool,
+    onItemClick: PropTypes.func,
 };

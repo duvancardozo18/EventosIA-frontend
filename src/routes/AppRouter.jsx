@@ -12,13 +12,15 @@ import Layout from "./layout";
   import Login from "../pages/auth/Login";
   import Homepage from "../pages/Homepage";
   import VerifyAccount from "../pages/auth/VerifyAccount"
-  import VerificationSuccess from "../pages/auth/VerificationSuccess"
-  import VerificationRedirect from "../pages/auth/VerificationRedirect"
+  //import VerificationSuccess from "../pages/auth/VerificationSuccess"
+  //import VerificationRedirect from "../pages/auth/VerificationRedirect"
   import Register from "../pages/auth/Register";
   import ResetPassword from "../pages/forgotpassword/ResetPassword";
   import ResetPasswordForm from "../pages/forgotpassword/ResetPasswordForm";
   //import ParticipantsEvent from "../components/screens/events/eventscreate/form/ParticipantsEvent";
   //import FeedingEvent from "../components/screens/events/eventscreate/form/FeedingEvent";
+  import Profile from "../pages/dashboard/Profile";
+  
 
   // Componentes de creación de eventos
   import CardsView from "../screens/events/CardsView";
@@ -114,6 +116,10 @@ import Layout from "./layout";
         {
           path: "events",
           element: <CardsView />,
+        },
+         {
+          path: "profile",
+          element: <Profile />,
         },
         {
           path: "reports",

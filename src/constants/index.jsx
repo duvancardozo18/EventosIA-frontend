@@ -1,4 +1,4 @@
-import { Home, Calendar, ClipboardList, HelpCircle } from "lucide-react";
+import { Home, Calendar, ClipboardList, HelpCircle, User } from "lucide-react";
 
 export const navbarLinks = [
     {
@@ -13,6 +13,11 @@ export const navbarLinks = [
                 label: "Mis Eventos",
                 icon: Calendar,
                 path: "events",
+            },
+            {
+                label: "Perfil",
+                icon: User,
+                path: "profile",
             },
         ],
     }

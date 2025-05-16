@@ -139,25 +139,17 @@ export const Header = ({ collapsed, setCollapsed }) => {
           {isProfileMenuOpen && (
             <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50 overflow-hidden">
               <div className="p-3 border-b bg-gray-50">
+
                 <p className="text-sm font-medium text-gray-800 truncate">{email}</p>
-                <p className="text-xs text-gray-500">{role || "Usuario"}</p>
               </div>
               <div className="py-1">
                 <Link
-                  to="/profile"
+                  to="/dashboard/profile"
                   className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                   onClick={() => setIsProfileMenuOpen(false)}
                 >
                   <User size={16} />
                   <span>Mi Perfil</span>
-                </Link>
-                <Link
-                  to="/settings"
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                  onClick={() => setIsProfileMenuOpen(false)}
-                >
-                  <Settings size={16} />
-                  <span>Configuración</span>
                 </Link>
                 <button
                   onClick={handleLogout}

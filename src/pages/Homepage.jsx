@@ -4,6 +4,7 @@ import Navbar from '../components/home/Navbar/Navbar'
 import FeaturesSection from '../components/home/FeaturesSection/FeaturesSection'
 import ContactFormSection from '../components/home/ContactFormSection/ContactFormSection' 
 import Footer from '../components/home/Footer/Footer'
+import ChatBot from '../components/ChatBot'
 
 
 const Homepage = () => {
@@ -12,6 +13,7 @@ const Homepage = () => {
       <Navbar />
       <LandingSection />
       <FeaturesSection />
+      <ChatBot />
       <ContactFormSection />
       <Footer />
     </div>

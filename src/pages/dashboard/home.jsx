@@ -5,6 +5,7 @@ import { AuthContext } from "../../config/AuthProvider"
 import AllEvents from "./all-events"
 import { Calendar, Users, Clock, TrendingUp } from "lucide-react"
 import axiosInstance from "../../config/AxiosInstance"
+import Chatbot from "../../components/ChatBot"
 
 const Dashboard = () => {
   const { permissions, loading: authLoading, isAuthenticated, userId } = useContext(AuthContext)
@@ -171,7 +172,9 @@ const Dashboard = () => {
         {/* Componente de todos los eventos */}
         <AllEvents />
       </div>
+      <Chatbot />
     </div>
+    
   )
 }
 

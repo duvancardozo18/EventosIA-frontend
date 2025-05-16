@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"
 import { ArrowLeft, Mail, AlertCircle, Check, Eye, EyeOff } from "lucide-react"
 import axiosInstance from "../../config/AxiosInstance"
 import { AuthContext } from "../../config/AuthProvider"
+import Chatbot from "../../components/ChatBot"
 
 const Login = () => {
   const [email, setEmail] = useState("")
@@ -415,7 +416,11 @@ const Login = () => {
             )}
           </div>
         </div>
+
       )}
+      <Chatbot />
+
+      {/* Estilos para la animación de entrada */}
 
       <style>{`
         @keyframes fadeIn {

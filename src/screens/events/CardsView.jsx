@@ -4,6 +4,7 @@ import { useState, useEffect, useContext } from "react"
 import axiosInstance from "../../config/AxiosInstance"
 import { AuthContext } from "../../config/AuthProvider"
 import { Calendar, Search, Frown } from "lucide-react"
+import Chatbot from "../../components/ChatBot"
 
 const MyEvents = () => {
   const [myEvents, setMyEvents] = useState([])
@@ -204,7 +205,9 @@ useEffect(() => {
           ))}
         </div>
       )}
+      <Chatbot/> 
     </div>
+    
   )
 }
 

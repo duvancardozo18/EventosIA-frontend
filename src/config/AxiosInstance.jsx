@@ -6,7 +6,7 @@ const axiosInstance = axios.create({
     "Content-Type": "application/json",
   },
   // Importante: Configurar withCredentials para enviar cookies con las solicitudes
-  //withCredentials: true,
+  withCredentials: true,
 })
 
 // Interceptor de solicitud para agregar el token de autenticación
@@ -25,15 +25,11 @@ axiosInstance.interceptors.request.use(
 
 // Interceptor de respuesta para manejar errores globalmente
 axiosInstance.interceptors.response.use(
-  (response) => response, // Retorna la respuesta si no hay errores
+  (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Si hay un error 401 (no autorizado), redirigir al login
-      localStorage.removeItem("access_token") // Eliminar el token expirado
-      window.location.href = "/" // Redirigir al login
-    }
-    return Promise.reject(error) // Retornar el error para manejarlo localmente si es necesario
-  },
+    // Solo notifica el error, no elimines el token ni redirijas aquí
+    return Promise.reject(error)
+  }
 )
 
 export default axiosInstance

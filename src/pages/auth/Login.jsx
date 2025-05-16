@@ -418,7 +418,7 @@ const Login = () => {
         </div>
 
       )}
-      <Chatbot />
+     
 
       {/* Estilos para la animación de entrada */}
 

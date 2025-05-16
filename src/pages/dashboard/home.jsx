@@ -172,7 +172,7 @@ const Dashboard = () => {
         {/* Componente de todos los eventos */}
         <AllEvents />
       </div>
-      <Chatbot />
+     
     </div>
     
   )

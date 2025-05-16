@@ -13,7 +13,7 @@ const Homepage = () => {
       <Navbar />
       <LandingSection />
       <FeaturesSection />
-      <ChatBot />
+     
       <ContactFormSection />
       <Footer />
     </div>

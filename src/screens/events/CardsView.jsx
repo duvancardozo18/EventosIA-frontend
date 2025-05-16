@@ -205,7 +205,6 @@ useEffect(() => {
           ))}
         </div>
       )}
-      <Chatbot/> 
     </div>
     
   )

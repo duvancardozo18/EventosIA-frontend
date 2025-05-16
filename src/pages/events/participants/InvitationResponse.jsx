@@ -1,12 +1,13 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState,useRef } from "react";
 import { FiCheckCircle, FiXCircle } from "react-icons/fi";
-import axiosInstance from "../../../config/AxiosInstance"; // ajusta esta ruta según tu estructura
+import axiosInstance from "../../../config/AxiosInstance"; 
 
 export default function InvitationResponse() {
-  const { token, action } = useParams(); // token es obligatorio, action puede ser "rechazar" o undefined
-  const [status, setStatus] = useState(null); // 'accepted' | 'rejected' | 'error'
+  const { token, action } = useParams(); 
+  const [status, setStatus] = useState(null); 
   const [loading, setLoading] = useState(true);
+  const hasRequested = useRef(false);
 
   useEffect(() => {
     const handleInvitation = async () => {
@@ -26,7 +27,10 @@ export default function InvitationResponse() {
       }
     };
 
-    handleInvitation();
+    if (!hasRequested.current) {
+      hasRequested.current = true;
+      handleInvitation();
+    }
   }, [token, action]);
 
   const renderContent = () => {

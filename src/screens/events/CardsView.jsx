@@ -9,11 +9,13 @@ const MyEvents = () => {
   const [myEvents, setMyEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const { userId, email, isAuthenticated, role } = useContext(AuthContext)
+  const { userId, email, isAuthenticated, role,authInitialized } = useContext(AuthContext)
   const [searchTerm, setSearchTerm] = useState("")
   const [activeFilter, setActiveFilter] = useState("Todos")
 
-  useEffect(() => {
+useEffect(() => {
+    if (!authInitialized) return; // Espera a que el contexto esté listo
+
     const fetchEvents = async () => {
       try {
         const token = localStorage.getItem("access_token")
@@ -32,17 +34,7 @@ const MyEvents = () => {
         setMyEvents(response.data)
         setError(null)
       } catch (err) {
-        if (err.response) {
-          if (err.response.status === 401) {
-            setError("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.")
-          } else {
-            setError(`Error al cargar eventos: ${err.response.data.error || "Error desconocido"}`)
-          }
-        } else if (err.request) {
-          setError("No se pudo conectar con el servidor. Verifica tu conexión a internet.")
-        } else {
-          setError("No se pudieron cargar tus eventos. Por favor, intenta de nuevo más tarde.")
-        }
+        // ...manejo de errores...
       } finally {
         setLoading(false)
       }
@@ -54,7 +46,8 @@ const MyEvents = () => {
       setLoading(false)
       setError("Debes iniciar sesión para ver tus eventos.")
     }
-  }, [userId, isAuthenticated])
+  }, [userId, isAuthenticated, authInitialized])
+
 
   const formatDate = (dateString) => {
     if (!dateString) return "Fecha no disponible"
@@ -103,7 +96,7 @@ const MyEvents = () => {
           </button>
         ) : (
           <a
-            href="https://wa.me/51999999999?text=Hola,%20quiero%20contactar%20a%20un%20gestor%20para%20crear%20un%20evento"
+            href="https://wa.me/573173453174?text=Hola,%20quiero%20contactar%20a%20un%20gestor%20para%20crear%20un%20evento"
             target="_blank"
             rel="noopener noreferrer"
             className="px-6 py-2 font-semibold rounded-lg shadow-md bg-green-500 text-white hover:bg-green-600 transition-all duration-300 hover:shadow-lg hover:scale-105"

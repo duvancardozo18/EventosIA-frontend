@@ -65,19 +65,19 @@ export const AuthProvider = ({ children }) => {
 
         // Verifica si el token es válido y no ha expirado
         if (decodedToken && decodedToken.exp * 1000 > Date.now()) {
-          // CAMBIO AQUÍ: Usar id_user en lugar de sub
           setUserId(decodedToken.id_user)
           setEmail(decodedToken.email || "")
+          setRole(decodedToken.id_role) 
           console.log("ID de usuario establecido:", decodedToken.id_user)
-
-
         } else {
           console.warn("El token es inválido o ha expirado")
           localStorage.removeItem("access_token")
           setIsAuthenticated(false)
+          setRole(null)
         }
       } else {
         setIsAuthenticated(false)
+        setRole(null)
       }
       setLoading(false)
       setAuthInitialized(true)
@@ -85,8 +85,6 @@ export const AuthProvider = ({ children }) => {
 
     initializeAuth()
   }, [])
-
-
 
   // Función para manejar el login
   const login = async (token) => {
@@ -97,10 +95,9 @@ export const AuthProvider = ({ children }) => {
       console.log("Login - Token decodificado:", decodedToken)
 
       if (decodedToken) {
-        // CAMBIO AQUÍ: Usar id_user en lugar de sub
         setUserId(decodedToken.id_user)
+        setRole(decodedToken.id_role) 
         console.log("Login - ID de usuario establecido:", decodedToken.id_user)
-
       }
     } catch (error) {
       console.error("Error durante el login:", error)

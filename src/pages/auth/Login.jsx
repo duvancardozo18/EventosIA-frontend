@@ -12,7 +12,7 @@ const Login = () => {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const { login } = useContext(AuthContext)
+  const { login, role, isAuthenticated, authInitialized } = useContext(AuthContext)
   const navigate = useNavigate()
 
   // Estados para validación
@@ -62,6 +62,17 @@ const Login = () => {
     }
   }, [email, password, formSubmitted])
 
+  // Redirección según el rol después de login exitoso
+  useEffect(() => {
+    if (authInitialized && isAuthenticated) {
+      if (role === 1 || role === 2) {
+        navigate("/dashboard/inicio")
+      } else if (role) {
+        navigate("/dashboard/events")
+      }
+    }
+  }, [isAuthenticated, role, authInitialized, navigate])
+
   const handleLogin = async (e) => {
     e.preventDefault()
     setError("")
@@ -91,8 +102,8 @@ const Login = () => {
       }
 
       localStorage.setItem("access_token", data.token)
-      login(data.token)
-      navigate("/dashboard")
+      await login(data.token)
+      // La redirección se maneja en el useEffect de arriba según el rol
     } catch (err) {
       if (err.response) {
         setError(err.response.data.error || "Error en el servidor")
@@ -118,7 +129,6 @@ const Login = () => {
 
     setVerificationLoading(true)
     try {
-      // Aquí deberías hacer la llamada a tu API para solicitar el correo de verificación
       await axiosInstance.post("/resend-verification-email", {
         email: verificationEmail.trim(),
       })

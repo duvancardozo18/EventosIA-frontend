@@ -10,19 +10,9 @@ export const navbarLinks = [
                 path: "inicio",
             },
             {
-                label: "Eventos",
+                label: "Mis Eventos",
                 icon: Calendar,
                 path: "events",
-            },
-            {
-                label: "Reportes",
-                icon: ClipboardList,
-                path: "reports",
-            },
-            {
-                label: "Ayuda",
-                icon: HelpCircle,
-                path: "help",
             },
         ],
     }

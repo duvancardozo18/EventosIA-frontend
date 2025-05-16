@@ -1,15 +1,24 @@
-import { forwardRef } from "react";
+import { forwardRef, useContext } from "react";
 import { NavLink } from "react-router-dom";
-
 import { navbarLinks } from "../../constants/index";
-
-
 import { cn } from "../../utils/cn";
-
 import PropTypes from "prop-types";
 import { CgProfile } from "react-icons/cg";
+import { AuthContext } from "../../config/AuthProvider";
+
+// Filtra los links según el rol
+const filterLinksByRole = (links, role) => {
+    if (role === 1 || role === 2) return links;
+    return links.map(section => ({
+        ...section,
+        links: section.links.filter(link => link.label !== "Inicio")
+    }));
+};
 
 export const Sidebar = forwardRef(({ collapsed }, ref) => {
+    const { role } = useContext(AuthContext);
+    const filteredLinks = filterLinksByRole(navbarLinks, role);
+
     return (
         <aside
             ref={ref}
@@ -24,7 +33,7 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
                 {!collapsed && <p className="text-lg font-medium transition-colors text-slate-900">EventosIA</p>}
             </div>
             <div className="flex w-full flex-col gap-y-4 overflow-y-auto overflow-x-hidden p-3 [scrollbar-width:_thin]">
-                {navbarLinks.map((navbarLink) => (
+                {filteredLinks.map((navbarLink) => (
                     <nav
                         key={navbarLink.title}
                         className={cn("sidebar-group", collapsed && "md:items-center")}

@@ -1,54 +1,38 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import axiosInstance from "../../config/AxiosInstance"
-import { useContext } from "react"
 import { AuthContext } from "../../config/AuthProvider"
-import { Calendar, Search } from "lucide-react"
+import { Calendar, Search, Frown } from "lucide-react"
 
 const MyEvents = () => {
   const [myEvents, setMyEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const { userId, email, isAuthenticated } = useContext(AuthContext)
+  const { userId, email, isAuthenticated, role } = useContext(AuthContext)
   const [searchTerm, setSearchTerm] = useState("")
   const [activeFilter, setActiveFilter] = useState("Todos")
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        // Verificar si hay un token en localStorage
         const token = localStorage.getItem("access_token")
         if (!token) {
-          console.log("No hay token disponible")
           setError("No has iniciado sesión. Por favor, inicia sesión para ver tus eventos.")
           setLoading(false)
           return
         }
-
-        // Verificar si tenemos userId
         if (!userId) {
-          console.log("No hay ID de usuario disponible")
           setError("No se pudo identificar al usuario. Por favor, espera un momento.")
           setLoading(false)
           return
         }
-
-        console.log("Intentando obtener eventos para el usuario ID:", userId)
         setLoading(true)
-
-        // Usar la ruta correcta del backend para obtener los eventos del usuario
-        // La ruta correcta es /events/users/:id según el router del backend
         const response = await axiosInstance.get(`/events/users/${userId}`)
-        console.log("Respuesta de eventos:", response.data)
         setMyEvents(response.data)
         setError(null)
       } catch (err) {
-        console.error("Error fetching my events:", err)
-
         if (err.response) {
-          console.error("Error response:", err.response.status, err.response.data)
-
           if (err.response.status === 401) {
             setError("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.")
           } else {
@@ -64,7 +48,6 @@ const MyEvents = () => {
       }
     }
 
-    // Solo ejecutar si el usuario está autenticado
     if (isAuthenticated && userId) {
       fetchEvents()
     } else {
@@ -73,38 +56,28 @@ const MyEvents = () => {
     }
   }, [userId, isAuthenticated])
 
-  // Función para formatear la fecha
   const formatDate = (dateString) => {
     if (!dateString) return "Fecha no disponible"
-
     try {
       const date = new Date(dateString)
       if (isNaN(date.getTime())) return "Fecha inválida"
-
       const day = date.getDate()
       const month = date.toLocaleString("es-ES", { month: "short" }).toUpperCase()
       const weekday = date.toLocaleString("es-ES", { weekday: "short" }).toUpperCase()
       const hours = date.getHours().toString().padStart(2, "0")
       const minutes = date.getMinutes().toString().padStart(2, "0")
-
       return `${day} ${month} - ${weekday} - ${hours}:${minutes}`
     } catch (error) {
-      console.error("Error al formatear fecha:", error)
       return "Error en fecha"
     }
   }
 
-  // Filtrado de eventos con validación
   const filteredEvents = myEvents.filter((event) => {
-    // Validar que event y sus propiedades existan
     if (!event) return false
-
     const eventName = event.name || event.event_name || ""
     const eventRole = event.user_role || ""
-
     const matchesSearch = eventName.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesRole = activeFilter === "Todos" || eventRole.toLowerCase() === activeFilter.toLowerCase()
-
     return matchesSearch && matchesRole
   })
 
@@ -117,32 +90,27 @@ const MyEvents = () => {
     )
   }
 
-  if (error) {
-    return (
-      <div className="p-6 text-center">
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4">
-          <p>{error}</p>
-        </div>
-        <button
-          onClick={() => window.location.reload()}
-          className="bg-[#365486] text-white px-4 py-2 rounded-lg hover:bg-[#4a6da8] transition-colors"
-        >
-          Reintentar
-        </button>
-      </div>
-    )
-  }
-
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-[#365486]">Mis Eventos</h1>
-        <button
-          onClick={() => (window.location.href = "/dashboard/events/create-event")}
-          className="px-6 py-2 font-semibold rounded-lg shadow-md bg-[#365486] text-white hover:bg-[#4a6da8] transition-all duration-300 hover:shadow-lg hover:scale-105"
-        >
-          Crear Evento
-        </button>
+        {(role === 1 || role === 2) ? (
+          <button
+            onClick={() => (window.location.href = "/dashboard/events/create-event")}
+            className="px-6 py-2 font-semibold rounded-lg shadow-md bg-[#365486] text-white hover:bg-[#4a6da8] transition-all duration-300 hover:shadow-lg hover:scale-105"
+          >
+            Crear Evento
+          </button>
+        ) : (
+          <a
+            href="https://wa.me/51999999999?text=Hola,%20quiero%20contactar%20a%20un%20gestor%20para%20crear%20un%20evento"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-6 py-2 font-semibold rounded-lg shadow-md bg-green-500 text-white hover:bg-green-600 transition-all duration-300 hover:shadow-lg hover:scale-105"
+          >
+            Contactar a un gestor
+          </a>
+        )}
       </div>
 
       {/* Barra de búsqueda */}
@@ -177,19 +145,22 @@ const MyEvents = () => {
       <h2 className="text-xl font-semibold mb-4">Más recientes</h2>
 
       {filteredEvents.length === 0 ? (
-        <div className="bg-gray-50 rounded-lg p-8 text-center">
-          <h3 className="text-lg font-medium text-gray-700 mb-2">No tienes eventos con este filtro</h3>
-          <p className="text-gray-500 mb-4">Prueba con otro filtro o crea un nuevo evento.</p>
-          <a
-            href="/dashboard/events/create-event"
-            className="inline-block bg-[#365486] text-white px-4 py-2 rounded-lg hover:bg-[#4a6da8] transition-colors"
-          >
-            Crear un evento
-          </a>
+        <div className="bg-gray-50 rounded-lg p-8 text-center flex flex-col items-center">
+          <Frown className="w-12 h-12 text-gray-400 mb-2" />
+          <h3 className="text-lg font-medium text-gray-700 mb-2">No tienes eventos</h3>
+          {role !== 1 && role !== 2 && (
+            <a
+              href="https://wa.me/51999999999?text=Hola,%20quiero%20contactar%20a%20un%20gestor%20para%20crear%20un%20evento"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 px-6 py-2 font-semibold rounded-lg shadow-md bg-green-500 text-white hover:bg-green-600 transition-all duration-300 hover:shadow-lg hover:scale-105"
+            >
+              Contactar a un gestor
+            </a>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 ">
-
           {filteredEvents.map((event) => (
             <a
               key={event.id_event}
@@ -237,7 +208,6 @@ const MyEvents = () => {
               </div>
             </a>
           ))}
-
         </div>
       )}
     </div>

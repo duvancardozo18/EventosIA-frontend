@@ -13,7 +13,7 @@ const Register = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    id_role: 1,
+    id_role: 3,
   })
 
   const [errors, setErrors] = useState({

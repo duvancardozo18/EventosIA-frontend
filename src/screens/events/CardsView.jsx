@@ -161,9 +161,10 @@ useEffect(() => {
               className="block h-full"
               style={{ textDecoration: "none" }}
             >
-              <div
-                className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow hover:scale-105 transition-transform duration-200 h-full cursor-pointer max-w-xs mx-auto "
-              >
+                <div
+                  className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300 hover:translate-y-[-5px] cursor-pointer block h-full"
+                >
+
                 <div className="h-40 bg-gray-200 relative">
                   {event.image_url && Array.isArray(event.image_url) && event.image_url.length > 0 ? (
                     <img

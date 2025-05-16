@@ -249,9 +249,11 @@ const AllEvents = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredAndSortedEvents.map((event) => (
-                <div
+                <a
                   key={event.id_event}
-                  className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300 hover:translate-y-[-5px]"
+                  href={`/dashboard/events/detail-events/${event.id_event}`}
+                  className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300 hover:translate-y-[-5px] cursor-pointer block"
+                  style={{ textDecoration: "none" }}
                 >
                   <div className="h-48 bg-gray-200 relative">
                     {event.image_url && Array.isArray(event.image_url) && event.image_url.length > 0 ? (
@@ -286,16 +288,14 @@ const AllEvents = () => {
                       <span className="text-sm text-gray-500">
                         {event.max_participants ? `Máx. ${event.max_participants} participantes` : ""}
                       </span>
-                      <a
-                        href={`/dashboard/events/detail-events/${event.id_event}`}
-                        className="text-[#365486] hover:text-[#4a6da8] font-medium text-sm"
-                      >
+                      <span className="text-[#365486] hover:text-[#4a6da8] font-medium text-sm">
                         Ver detalles
-                      </a>
+                      </span>
                     </div>
                   </div>
-                </div>
+                </a>
               ))}
+
             </div>
           )}
         </div>

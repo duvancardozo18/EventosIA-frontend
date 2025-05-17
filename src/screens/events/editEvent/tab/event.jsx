@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { HiArrowRight, HiX } from "react-icons/hi";
-import Label from "../../../../components/events/LabelForm";
-import Input from "../../../../components/events/InputForm";
-import Dropzone from "../../../../components/events/Dropzone";
+import EventForm from "../../forms/eventForm";
 import useEditTabNavigation from "../../../../hooks/useEditTabNavigation";
 
 const Event = () => {
@@ -11,41 +8,67 @@ const Event = () => {
     formData,
     updateFormData,
     markSectionCompleted,
-    goToNextSection,
-    currentSection
+    goToNextSection
   } = useOutletContext();
 
   const { showNextButton } = useEditTabNavigation("editarEvento");
 
-  const initialData = formData?.evento || {};
+  const initialEvento = formData?.evento || {};
+  const initialTipoEvento = formData?.tipoEvento || {};
 
-  const [localData, setLocalData] = useState(() => ({
-    event_name: initialData.event_name || "",
-    id_event_state: initialData.id_event_state || 1,
-    state: initialData.state || "",
-    image: undefined, // ← importante: no null
-    imagePreview: initialData.imagePreview || initialData.image_url || "",
-    imageFileName: initialData.imageFileName || ""
-  }));
+  const [localData, setLocalData] = useState({
+    name: initialEvento.event_name || "",
+    image: undefined,
+    imagePreview: initialEvento.imagePreview || initialEvento.image_url || "",
+    imageFileName: initialEvento.imageFileName || "",
+    description: initialTipoEvento.event_type_description || "",
+    eventType: initialTipoEvento.id_category || ""
+  });
 
-  useEffect(() => {
-    if (formData?.evento) {
-      setLocalData(prev => ({
-        event_name: formData.evento.event_name || prev.event_name,
-        id_event_state: formData.evento.id_event_state || prev.id_event_state,
-        state: formData.evento.state || prev.state,
-        image: prev.image, // si se cargó una nueva, se conserva
-        imagePreview: prev.image ? prev.imagePreview : formData.evento.imagePreview || formData.evento.image_url || prev.imagePreview,
-        imageFileName: prev.imageFileName
-      }));
+  const [formErrors, setFormErrors] = useState({
+    name: "",
+    image: "",
+    description: "",
+    eventType: ""
+  });
+
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
+  const validateForm = () => {
+    const errors = {
+      name: "",
+      image: "",
+      description: "",
+      eventType: ""
+    };
+
+    if (!localData.name.trim()) {
+      errors.name = "El nombre del evento es obligatorio";
     }
-  }, [formData]);
+
+    if (!localData.image && !localData.imagePreview) {
+      errors.image = "La imagen del evento es obligatoria";
+    } else if (localData.imageFileName) {
+      const ext = localData.imageFileName.split(".").pop().toLowerCase();
+      if (!["jpg", "jpeg", "png"].includes(ext)) {
+        errors.image = "Solo se permiten imágenes en formato JPG o PNG";
+      }
+    }
+
+    if (!localData.description.trim()) {
+      errors.description = "La descripción es obligatoria";
+    }
+
+    if (!localData.eventType) {
+      errors.eventType = "La categoría es obligatoria";
+    }
+
+    setFormErrors(errors);
+    return Object.values(errors).every((e) => !e);
+  };
 
   const handleChange = (field, value) => {
-    setLocalData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setLocalData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleImageUpload = (file) => {
@@ -53,7 +76,7 @@ const Event = () => {
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setLocalData(prev => ({
+      setLocalData((prev) => ({
         ...prev,
         image: file,
         imagePreview: reader.result,
@@ -65,7 +88,7 @@ const Event = () => {
   };
 
   const handleRemoveImage = () => {
-    setLocalData(prev => ({
+    setLocalData((prev) => ({
       ...prev,
       image: null,
       imagePreview: "",
@@ -75,85 +98,67 @@ const Event = () => {
 
   const handleNext = (e) => {
     e.preventDefault();
-    // Clonar evento original sin campo image si no hay nueva imagen
-    const updated = {
+    setFormSubmitted(true);
+
+    if (!validateForm()) return;
+
+    // Guardar en formData.evento
+    updateFormData("evento", {
       ...formData.evento,
-      ...localData
-    };
+      event_name: localData.name,
+      event_state_id: formData.evento?.event_state_id || 1,
+      image: localData.image instanceof File ? localData.image : undefined,
+      imagePreview: localData.imagePreview,
+      imageFileName: localData.imageFileName
+    });
 
-    // 🔥 Forzar eliminación del campo image si NO es un File
-    if (!(localData.image instanceof File)) {
-      delete updated.image;
-    }
+    // Guardar en formData.tipoEvento
+    updateFormData("tipoEvento", {
+      ...formData.tipoEvento,
+      event_type_description: localData.description,
+      id_category: localData.eventType
+    });
 
-    updateFormData("evento", updated);
     markSectionCompleted("editarEvento");
     goToNextSection();
   };
 
+  // Cargar categorías desde el backend
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [errorCategories, setErrorCategories] = useState(null);
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${API_URL}/categories`);
+        if (!response.ok) throw new Error("Error al cargar las categorías");
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        setErrorCategories(error.message);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, [API_URL]);
+
   return (
-    <div className="max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Detalles del Evento</h2>
-
-      <form onSubmit={handleNext} className="space-y-6">
-        <div className="mb-4">
-          <Label htmlFor="event_name" text="Nombre del Evento" />
-          <Input
-            id="event_name"
-            type="text"
-            value={localData.event_name}
-            onChange={(e) => handleChange("event_name", e.target.value)}
-            placeholder="Ingrese el nombre del evento"
-            className="w-full"
-            required
-          />
-          <div className="text-xs text-gray-500">
-            Valor actual: {localData.event_name || "No definido"}
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <Label htmlFor="image" text="Imagen del Evento" />
-
-          {localData.imagePreview && (
-            <div className="mb-2 flex justify-end">
-              <button
-                type="button"
-                onClick={handleRemoveImage}
-                className="flex items-center px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
-                title="Eliminar imagen"
-              >
-                <HiX className="h-4 w-4 mr-1" />
-                Eliminar imagen
-              </button>
-            </div>
-          )}
-
-          <Dropzone
-            onFileSelect={handleImageUpload}
-            imagePreview={localData.imagePreview}
-          />
-
-          {localData.imagePreview && (
-            <div className="mt-1 text-xs text-gray-500">
-              Imagen cargada: {localData.imageFileName || "Imagen del servidor"}
-            </div>
-          )}
-        </div>
-
-        <div className="flex justify-end mt-6">
-          {showNextButton && (
-            <button
-              type="submit"
-              className="flex items-center px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-            >
-              Siguiente
-              <HiArrowRight className="ml-2" />
-            </button>
-          )}
-        </div>
-      </form>
-    </div>
+    <EventForm
+      localData={localData}
+      formErrors={formErrors}
+      formSubmitted={formSubmitted}
+      categories={categories}
+      loadingCategories={loadingCategories}
+      errorCategories={errorCategories}
+      showNextButton={showNextButton}
+      handleChange={handleChange}
+      handleImageUpload={handleImageUpload}
+      handleRemoveImage={handleRemoveImage}
+      handleNext={handleNext}
+    />
   );
 };
 

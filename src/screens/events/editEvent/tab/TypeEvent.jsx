@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from "react-router-dom";
 import useEditTabNavigation from '../../../../hooks/useEditTabNavigation';
-import NavigationButtons from '../../createEvent/tabs/NavigationButtons';
-import TypeEventForm from '../../createEvent/tabs/TypeEventForm';
+
+import NavigationButtons from '../../NavigationButtons';
+import TypeEventForm from '../../forms/TypeEventForm';
 import { toast } from 'react-toastify';
 import ConfirmationModal from '../../../../components/events/ConfirmationModal';
 

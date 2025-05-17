@@ -1,5 +1,5 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react"; // 👈 importa useRef
+import { useState, useEffect, useRef } from "react";
 import Tabs from "./tab/tab";
 import { useEditEventAPI } from "../../../hooks/useEditEventApi";
 import { toast } from "react-toastify";
@@ -23,7 +23,7 @@ const EditEvent = () => {
 
   const [formData, setFormData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const hasRedirectedRef = useRef(false); // 👈 nueva ref
+  const hasLoadedRef = useRef(false);
 
   const organizeFormData = (data) => ({
     id_event: data.id_event,
@@ -54,52 +54,47 @@ const EditEvent = () => {
       location_price: data.location_price
     }
   });
-  
 
-const hasLoadedRef = useRef(false);
-
-useEffect(() => {
-  const loadEvent = async () => {
-    if (!eventId) {
-      toast.error("ID de evento no proporcionado");
-      navigate("/dashboard/events");
-      return;
-    }
-
-    try {
-      const data = await getEventById(eventId);
-      const organizedData = organizeFormData(data);
-      console.log("🧾 Datos organizados desde organizeFormData:", organizedData); // 👈 aqu
-      setFormData(organizedData);
-
-      const initialCompletedSections = {
-        editarEvento: true,
-        editarTipoEvento: !!data.id_type_of_event,
-        editarUbicacion: !!data.id_location
-      };
-
-      sessionStorage.setItem('editCompletedSections', JSON.stringify(initialCompletedSections));
-      sessionStorage.setItem('currentEditEvent', JSON.stringify({ id: eventId }));
-
-      if (location.pathname === "/dashboard/events/edit-event" && !hasLoadedRef.current) {
-        hasLoadedRef.current = true;
-        navigate(sections[0].path, { state: { eventId } });
+  useEffect(() => {
+    const loadEvent = async () => {
+      if (!eventId) {
+        toast.error("ID de evento no proporcionado");
+        navigate("/dashboard/events");
+        return;
       }
 
-    } catch (error) {
-      toast.error("No se pudo cargar el evento para edición");
-      navigate("/dashboard/events");
-    } finally {
-      setLoading(false);
+      try {
+        const data = await getEventById(eventId);
+        const organizedData = organizeFormData(data);
+        setFormData(organizedData);
+
+        const initialCompletedSections = {
+          editarEvento: true,
+          editarTipoEvento: !!data.id_type_of_event,
+          editarUbicacion: !!data.id_location
+        };
+
+        sessionStorage.setItem('editCompletedSections', JSON.stringify(initialCompletedSections));
+        sessionStorage.setItem('currentEditEvent', JSON.stringify({ id: eventId }));
+
+        if (location.pathname === "/dashboard/events/edit-event" && !hasLoadedRef.current) {
+          hasLoadedRef.current = true;
+          navigate(sections[0].path, { state: { eventId } });
+        }
+
+      } catch (error) {
+        toast.error("No se pudo cargar el evento para edición");
+        navigate("/dashboard/events");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!hasLoadedRef.current) {
+      hasLoadedRef.current = true;
+      loadEvent();
     }
-  };
-
-  if (!hasLoadedRef.current) {
-    hasLoadedRef.current = true;
-    loadEvent();
-  }
-}, [eventId]); // ✅ solo depende de `eventId`
-
+  }, [eventId]);
 
   const updateFormData = (section, updatedFields) => {
     setFormData((prev) => {
@@ -131,11 +126,29 @@ useEffect(() => {
     }
   };
 
+  const handleBack = () => {
+        navigate(`/dashboard/events/detail-events/${eventId}`, {
+    });
+  };
+
   if (loading || !formData) return <div className="p-4">Cargando datos del evento...</div>;
 
   return (
     <div className="w-full min-h-screen flex flex-col">
-      <div className="sticky top-0 z-10 bg-white shadow-md p-4">
+      <div className="relative top-0 z-10 p-4 ">
+        {/* Header visualmente igual que el de creación */}
+        <div className="relative mb-8 flex items-center justify-center">
+          {currentSection?.id === "editarEvento" && (
+            <button
+              onClick={handleBack}
+              className="absolute left-0 text-sm px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-all"
+            >
+              Volver
+            </button>
+          )}
+          <h1 className="text-2xl font-bold text-center">Edición de evento</h1>
+        </div>
+
         <Tabs
           sections={sections}
           currentPath={location.pathname.split("/").pop()}

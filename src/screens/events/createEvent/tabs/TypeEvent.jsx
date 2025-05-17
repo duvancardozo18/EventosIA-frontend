@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from "react-router-dom";
 import useTabNavigation from '../../../../hooks/useTabNavigation';
-import NavigationButtons from './NavigationButtons';
-import TypeEventForm from "./TypeEventForm";
+import NavigationButtons from '../../NavigationButtons';
+import TypeEventForm from "../../forms/TypeEventForm";
 
 const TypeEvent = () => {
   const {

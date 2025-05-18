@@ -62,7 +62,7 @@ const AddResource = () => {
       // Reset form y navegar
       setResourceData({ name: "", description: "", quantity: "", unitValue: "" });
       setErrors({});
-      navigate(`/dashboard/events/detail-events/${eventId}`); // Ajusta según tu ruta de regreso
+      navigate(`/dashboard/events/detail-events/${eventId}/resource-list`); // Ajusta según tu ruta de regreso
     } catch (err) {
       console.error("Error:", err);
       alert("Ocurrió un error al crear o asignar el recurso.");

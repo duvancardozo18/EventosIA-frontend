@@ -250,44 +250,53 @@ const EventDetail = () => {
                       <span className="text-gray-700">Cancelado {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'cancelado').length}</span>
                     </div>
                   </div>
+
+                  {/* Botón de agregar participante */}
+                  <div className="flex justify-end max-w-3xl mx-auto mb-4">
+                    <button 
+                      onClick={() => navigate(`/dashboard/events/invite/${id}`)}
+                      className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none"
+                    >
+                      <FiPlus size={24} />
+                    </button>
+                  </div>
+
                   {/* Listado */}
                   <div className="space-y-4 max-w-3xl mx-auto">
                     {dataTab.Participantes.length === 0 ? (
-                    <>
                       <div className="flex flex-col items-center text-center text-gray-500 space-y-4 py-10">
                         <FiUser size={48} className="text-gray-400" />
                         <p className="text-lg font-semibold">No hay participantes</p>
-                        <p className="text-sm">Puedes agregar participantes oprimiendo el botón de abajo "ver todos los participantes".</p>
+                        <p className="text-sm">Puedes agregar participantes oprimiendo el botón de arriba.</p>
                       </div>
-                    </>
                     ) : (
-                    <>
-                      {dataTab.Participantes.slice(0, 3).map(u => (
-                        <div key={u.id} className="flex items-start bg-white p-4 rounded-lg shadow">
-                          <FiUser size={32} className="text-gray-400 mr-4" />
-                          <div className="flex flex-col">
-                            <p className="font-semibold text-gray-900">{u.user_name + u.user_last_name}</p>
-                            <p className="text-sm text-gray-500 mb-2">{u.email}</p>
-                            <div className="flex items-center">
-                              {u.status_name === 'confirmado' && <FiCheckCircle className="text-green-500 mr-1" />}
-                              {u.status_name === 'pendiente' && <FiClock className="text-yellow-500 mr-1" />}
-                              {u.status_name === 'cancelado' && <FiXCircle className="text-red-500 mr-1" />}
-                              <span className="text-sm text-black font-semibold bg-gray-200 rounded-2xl px-3 py-1">
-                                {u.status_name}
-                              </span>
+                      <>
+                        {dataTab.Participantes.slice(0, 3).map(u => (
+                          <div key={u.id} className="flex items-start bg-white p-4 rounded-lg shadow">
+                            <FiUser size={32} className="text-gray-400 mr-4" />
+                            <div className="flex flex-col">
+                              <p className="font-semibold text-gray-900">{u.user_name + u.user_last_name}</p>
+                              <p className="text-sm text-gray-500 mb-2">{u.email}</p>
+                              <div className="flex items-center">
+                                {u.status_name === 'confirmado' && <FiCheckCircle className="text-green-500 mr-1" />}
+                                {u.status_name === 'pendiente' && <FiClock className="text-yellow-500 mr-1" />}
+                                {u.status_name === 'cancelado' && <FiXCircle className="text-red-500 mr-1" />}
+                                <span className="text-sm text-black font-semibold bg-gray-200 rounded-2xl px-3 py-1">
+                                  {u.status_name}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </>
+                        ))}
+                      </>
                     )}
 
-                    {/* Botón siempre visible */}
+                    {/* Link al final */}
                     <button
-                    onClick={() => navigate(`/dashboard/events/participants/${id}`)}
-                    className="text-indigo-600 hover:underline font-semibold"
+                      onClick={() => navigate(`/dashboard/events/participants/${id}`)}
+                      className="text-indigo-600 hover:underline font-semibold mt-4"
                     >
-                    Ver todos los participantes 
+                      Ver todos los participantes
                     </button>
                   </div>
                 </>
@@ -321,10 +330,12 @@ const EventDetail = () => {
                             <p className="font-semibold text-gray-900 mb-1">{r.name}</p>
                             <p className="text-sm text-gray-500">{r.quantity_available} unidades</p>
                             <p className="text-sm text-gray-500">{r.description}</p>
+                            <p className="text-sm text-gray-500">Precio unitario: ${Number(r.price).toFixed(2)}</p>
                           </div>
                           <div className="flex items-center justify-between mt-4">
                             <p className="font-semibold text-indigo-600 flex items-center">
-                              <FiDollarSign className="mr-1" />{Number(r.price).toFixed(2)}
+                              <FiDollarSign className="mr-1" />
+                              {(Number(r.price) * Number(r.quantity_available)).toFixed(2)}
                             </p>
                           </div>
                         </div>
@@ -361,9 +372,11 @@ const EventDetail = () => {
                             <p className="font-semibold text-gray-900 mb-1">{f.name}</p>
                             <p className="text-sm text-gray-500">{f.quantity_available} unidades</p>
                             <p className="text-sm text-gray-500">{f.description}</p>
+                            <p className="text-sm text-gray-500">Precio unitario: ${Number(f.price).toFixed(2)}</p>
                           </div>
                           <p className="font-semibold text-indigo-600 flex items-center">
-                            <FiDollarSign className="mr-1" />{Number(f.price).toFixed(2)}
+                            <FiDollarSign className="mr-1" />
+                            {(Number(f.price) * Number(f.quantity_available)).toFixed(2)}
                           </p>
                         </div>
                       ))

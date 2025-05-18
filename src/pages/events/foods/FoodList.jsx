@@ -91,7 +91,7 @@ const FoodList = () => {
     <div className="min-h-screen p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center mb-6">
-          <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-indigo-600 flex items-center">
+          <button onClick={() => navigate(`/dashboard/events/detail-events/${eventId}`)} className="text-gray-600 hover:text-indigo-600 flex items-center">
             <FiArrowLeft className="mr-2" /> Volver
           </button>
         </div>

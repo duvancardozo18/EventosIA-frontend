@@ -124,7 +124,7 @@ const EditFood = () => {
     <div className="min-h-screen p-6">
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(`/dashboard/events/detail-events/${eventId}/food-list`)}
           className="flex items-center text-gray-600 hover:text-indigo-600 mb-6"
         >
           <FiArrowLeft className="mr-2" />

@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
-import NavigationButtons from '../../createEvent/tabs/NavigationButtons';
+import NavigationButtons from '../../NavigationButtons';
 import useEditTabNavigation from '../../../../hooks/useEditTabNavigation';
 import { useEditEventAPI } from '../../../../hooks/useEditEventApi';
 import { toast } from 'react-toastify';
 import ConfirmationModal from '../../../../components/events/ConfirmationModal';
-import LocationForm from '../../createEvent/tabs/LocationForm';
+import LocationForm from '../../forms/LocationForm';
 import { dataURLtoFile } from '../../../../utils/imageHelperrs';
 import { getFinalImageFile } from '../../../../utils/getFinalImageFile';
 

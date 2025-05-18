@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import Label from "../../../../components/events/LabelForm";
-import Input from "../../../../components/events/InputForm";
+import Label from "../../../components/events/LabelForm";
+import Input from "../../../components/events/InputForm";
 
 const LocationForm = ({
   data,
@@ -62,7 +62,7 @@ const LocationForm = ({
 
       {/* Precio */}
       <div>
-        <Label htmlFor="ubicacion_price">Precio ($) *</Label>
+        <Label htmlFor="ubicacion_price">Precio del alquiler ($) *</Label>
         <Input
           type="number"
           id="ubicacion_price"

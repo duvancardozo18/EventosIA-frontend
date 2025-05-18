@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 // Secciones específicas para la edición de eventos
 // Ajustamos las rutas para que coincidan con la configuración en AppRouter.jsx
 const editSections = [
-  { id: "editarEvento", name: "Evento", path: "/dashboard/events/edit-event/editarEvento" },
-  { id: "editarTipoEvento", name: "Tipo Evento", path: "/dashboard/events/edit-event/editarTipoEvento" },
+  { id: "editarEvento", name: "Detalles", path: "/dashboard/events/edit-event/editarEvento" },
+  { id: "editarTipoEvento", name: "Logistica", path: "/dashboard/events/edit-event/editarTipoEvento" },
   { id: "editarUbicacion", name: "Ubicación", path: "/dashboard/events/edit-event/editarUbicacion" }
 ];
 

@@ -194,7 +194,7 @@ const EventDetail = () => {
               </li>
             </ul>
           </div>
-          <button 
+          <button
             className="mt-8 self-start px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
             onClick={handleEditEvent}
           >
@@ -249,7 +249,9 @@ const EventDetail = () => {
                       <FiXCircle className="text-gray-600 mr-2" />
                       <span className="text-gray-700">Cancelado {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'cancelado').length}</span>
                     </div>
+                    
                   </div>
+
 
                   {/* Botón de agregar participante */}
                   <div className="flex justify-end max-w-3xl mx-auto mb-4">
@@ -291,6 +293,8 @@ const EventDetail = () => {
                       </>
                     )}
 
+
+
                     {/* Link al final */}
                     <button
                       onClick={() => navigate(`/dashboard/events/participants/${id}`)}
@@ -298,6 +302,7 @@ const EventDetail = () => {
                     >
                       Ver todos los participantes
                     </button>
+
                   </div>
                 </>
               )}
@@ -307,11 +312,11 @@ const EventDetail = () => {
                 <>
                   <div className="flex justify-between items-center mb-4 p-6">
                     <a
-                    onClick={() => navigate(`/dashboard/events/detail-events/${id}/resource-list`)}
-                    className="text-indigo-600 hover:underline font-semibold">Ver todos los recursos</a>
-                    <button 
-                    onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-resource`)}
-                    className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
+                      onClick={() => navigate(`/dashboard/events/detail-events/${id}/resource-list`)}
+                      className="text-indigo-600 hover:underline font-semibold">Ver todos los recursos</a>
+                    <button
+                      onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-resource`)}
+                      className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
                       <FiPlus size={24} />
                     </button>
                   </div>
@@ -349,11 +354,11 @@ const EventDetail = () => {
                 <>
                   <div className="flex justify-between items-center mb-4 p-6">
                     <a
-                    onClick={() => navigate(`/dashboard/events/detail-events/${id}/food-list`)}
-                    className="text-indigo-600 hover:underline font-semibold">Ver todos los alimentos</a>
-                    <button 
-                    onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-food`)}
-                    className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
+                      onClick={() => navigate(`/dashboard/events/detail-events/${id}/food-list`)}
+                      className="text-indigo-600 hover:underline font-semibold">Ver todos los alimentos</a>
+                    <button
+                      onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-food`)}
+                      className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
                       <FiPlus size={24} />
                     </button>
                   </div>

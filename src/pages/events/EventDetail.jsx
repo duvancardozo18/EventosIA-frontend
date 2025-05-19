@@ -140,11 +140,20 @@ const EventDetail = () => {
       </div>
       <div className="max-w-6xl mx-auto grid grid-cols-12 gap-8">
         <div className="col-span-12 lg:col-span-5 rounded-2xl overflow-hidden shadow-lg">
-          <img
-            src={event.image_url[0]}
-            alt={event.event_name}
-            className="w-full h-full object-cover"
-          />
+          <div className="w-full aspect-video bg-gray-200 flex items-center justify-center">
+            {event.image_url && event.image_url.length > 0 ? (
+              <img
+                src={event.image_url[0]}
+                alt={event.event_name}
+                className="w-full h-full object-cover object-center"
+                style={{ maxHeight: 400 }}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-500" style={{ minHeight: 250 }}>
+                Sin imagen
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Detalles generales */}

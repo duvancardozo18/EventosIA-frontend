@@ -15,6 +15,11 @@ const generateRandomPassword = () => {
   return password
 }
 
+const validateEmail = (email) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return re.test(email)
+}
+
 const LinkClientModal = ({ showModal, onClose, onSuccess }) => {
   // Aquí extraemos el id del evento de la URL
   const { id } = useParams()
@@ -32,13 +37,7 @@ const LinkClientModal = ({ showModal, onClose, onSuccess }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [linkedUserId, setLinkedUserId] = useState(null)
 
-
   if (!showModal) return null
-
-  const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return re.test(email)
-  }
 
   const handleChange = (field, value) => {
     if (field === 'name' || field === 'last_name') {
@@ -80,45 +79,49 @@ const LinkClientModal = ({ showModal, onClose, onSuccess }) => {
 
     setLoading(true)
     setError('')
+    let userId = null
 
     try {
-      // 1) Verificar existencia de usuario por email
-      const listRes = await axiosInstance.get('/users', {
-        params: { email: clientData.email },
-      })
-      const users = Array.isArray(listRes.data)
-        ? listRes.data
-        : listRes.data.usuarios || []
-      let userId
-
-      if (users.length > 0 && users[0].id_user) {
-        // usuario ya existe
-        userId = users[0].id_user
-      } else {
-        // 2) crear usuario nuevo
-        const randomPassword = generateRandomPassword()
-        const createRes = await axiosInstance.post('/users', {
-          name: clientData.name,
-          last_name: clientData.last_name,
-          email: clientData.email,
-          id_role: 3,
-          password: randomPassword,
-        })
-        const newUser = createRes.data.usuario
-        if (!newUser?.id_user) {
-          throw new Error('No se pudo crear el usuario')
+      // 1. Verificar si el usuario existe
+      try {
+        const userResponse = await axiosInstance.get(`/users/${clientData.email}`)
+        const userData = userResponse?.data?.usuario
+        if (userData?.id_user) {
+          userId = userData.id_user
         }
-        userId = newUser.id_user
+      } catch (err) {
+        if (err.response?.status === 404) {
+          // 2. Crear nuevo usuario si no existe
+          const randomPassword = generateRandomPassword()
+
+          const response = await axiosInstance.post("/users", {
+            name: clientData.name,
+            last_name: clientData.last_name,
+            email: clientData.email,
+            id_role: 3,
+            password: randomPassword,
+          })
+
+          await axiosInstance.post("/credentials", {
+            email: clientData.email,
+            password: randomPassword,
+          })
+
+          userId = response.data?.usuario?.id_user
+          if (!userId) throw new Error("No se pudo crear el usuario")
+        } else {
+          throw err // Re-lanza otros errores
+        }
       }
 
-      // 3) Obtener el price desde /events/prices/:event_id
+      // 3. Obtener el price desde /events/prices/:event_id
       const priceRes = await axiosInstance.get(`/events/prices/${id}`)
       const price = priceRes.data.total_value
       if (price == null) {
         throw new Error('No se obtuvo el precio del evento')
       }
 
-      // 4) Vincular usuario al evento enviando todos los campos obligatorios
+      // 4. Vincular usuario al evento enviando todos los campos obligatorios
       await axiosInstance.post('/billing', {
         user_id: userId,
         event_id: id,
@@ -138,7 +141,6 @@ const LinkClientModal = ({ showModal, onClose, onSuccess }) => {
     }
   }
 
-  if (!showModal) return null
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm">
       <div className="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md">

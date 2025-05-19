@@ -194,7 +194,7 @@ const EventDetail = () => {
               </li>
             </ul>
           </div>
-          <button 
+          <button
             className="mt-8 self-start px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
             onClick={handleEditEvent}
           >
@@ -249,46 +249,54 @@ const EventDetail = () => {
                       <FiXCircle className="text-gray-600 mr-2" />
                       <span className="text-gray-700">Cancelado {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'cancelado').length}</span>
                     </div>
+                    
                   </div>
+                  <div className="flex items-center justify-between mt-4">
+
+                      <button
+                        onClick={() => navigate(`/dashboard/events/participants/${id}`)}
+                        className="text-indigo-600 hover:underline font-semibold"
+                      >
+                        Ver todos los participantes
+                      </button>
+                      <button
+                        onClick={() => navigate(`/dashboard/events/invite/${id}`)}
+                        className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
+                        <FiPlus size={24} />
+                      </button>
+                    </div>
                   {/* Listado */}
                   <div className="space-y-4 max-w-3xl mx-auto">
                     {dataTab.Participantes.length === 0 ? (
-                    <>
-                      <div className="flex flex-col items-center text-center text-gray-500 space-y-4 py-10">
-                        <FiUser size={48} className="text-gray-400" />
-                        <p className="text-lg font-semibold">No hay participantes</p>
-                        <p className="text-sm">Puedes agregar participantes oprimiendo el botón de abajo "ver todos los participantes".</p>
-                      </div>
-                    </>
+                      <>
+
+                        <div className="flex flex-col items-center text-center text-gray-500 space-y-4 py-10">
+                          <FiUser size={48} className="text-gray-400" />
+                          <p className="text-lg font-semibold">No hay participantes</p>
+                          <p className="text-sm">Puedes agregar participantes oprimiendo el botón de abajo "ver todos los participantes".</p>
+                        </div>
+                      </>
                     ) : (
-                    <>
-                      {dataTab.Participantes.slice(0, 3).map(u => (
-                        <div key={u.id} className="flex items-start bg-white p-4 rounded-lg shadow">
-                          <FiUser size={32} className="text-gray-400 mr-4" />
-                          <div className="flex flex-col">
-                            <p className="font-semibold text-gray-900">{u.user_name + u.user_last_name}</p>
-                            <p className="text-sm text-gray-500 mb-2">{u.email}</p>
-                            <div className="flex items-center">
-                              {u.status_name === 'confirmado' && <FiCheckCircle className="text-green-500 mr-1" />}
-                              {u.status_name === 'pendiente' && <FiClock className="text-yellow-500 mr-1" />}
-                              {u.status_name === 'cancelado' && <FiXCircle className="text-red-500 mr-1" />}
-                              <span className="text-sm text-black font-semibold bg-gray-200 rounded-2xl px-3 py-1">
-                                {u.status_name}
-                              </span>
+                      <>
+                        {dataTab.Participantes.slice(0, 3).map(u => (
+                          <div key={u.id} className="flex items-start bg-white p-4 rounded-lg shadow">
+                            <FiUser size={32} className="text-gray-400 mr-4" />
+                            <div className="flex flex-col">
+                              <p className="font-semibold text-gray-900">{u.user_name + u.user_last_name}</p>
+                              <p className="text-sm text-gray-500 mb-2">{u.email}</p>
+                              <div className="flex items-center">
+                                {u.status_name === 'confirmado' && <FiCheckCircle className="text-green-500 mr-1" />}
+                                {u.status_name === 'pendiente' && <FiClock className="text-yellow-500 mr-1" />}
+                                {u.status_name === 'cancelado' && <FiXCircle className="text-red-500 mr-1" />}
+                                <span className="text-sm text-black font-semibold bg-gray-200 rounded-2xl px-3 py-1">
+                                  {u.status_name}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </>
+                        ))}
+                      </>
                     )}
-
-                    {/* Botón siempre visible */}
-                    <button
-                    onClick={() => navigate(`/dashboard/events/participants/${id}`)}
-                    className="text-indigo-600 hover:underline font-semibold"
-                    >
-                    Ver todos los participantes 
-                    </button>
                   </div>
                 </>
               )}
@@ -298,11 +306,11 @@ const EventDetail = () => {
                 <>
                   <div className="flex justify-between items-center mb-4 p-6">
                     <a
-                    onClick={() => navigate(`/dashboard/events/detail-events/${id}/resource-list`)}
-                    className="text-indigo-600 hover:underline font-semibold">Ver todos los recursos</a>
-                    <button 
-                    onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-resource`)}
-                    className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
+                      onClick={() => navigate(`/dashboard/events/detail-events/${id}/resource-list`)}
+                      className="text-indigo-600 hover:underline font-semibold">Ver todos los recursos</a>
+                    <button
+                      onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-resource`)}
+                      className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
                       <FiPlus size={24} />
                     </button>
                   </div>
@@ -338,11 +346,11 @@ const EventDetail = () => {
                 <>
                   <div className="flex justify-between items-center mb-4 p-6">
                     <a
-                    onClick={() => navigate(`/dashboard/events/detail-events/${id}/food-list`)}
-                    className="text-indigo-600 hover:underline font-semibold">Ver todos los alimentos</a>
-                    <button 
-                    onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-food`)}
-                    className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
+                      onClick={() => navigate(`/dashboard/events/detail-events/${id}/food-list`)}
+                      className="text-indigo-600 hover:underline font-semibold">Ver todos los alimentos</a>
+                    <button
+                      onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-food`)}
+                      className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
                       <FiPlus size={24} />
                     </button>
                   </div>

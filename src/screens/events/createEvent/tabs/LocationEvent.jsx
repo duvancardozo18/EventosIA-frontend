@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-import LocationForm from './LocationForm';
-import NavigationButtons from './NavigationButtons';
+import LocationForm from '../../forms/LocationForm';
+import NavigationButtons from '../../NavigationButtons';
 import { useEventAPI } from '../../../../hooks/useEventAPI';
 import useTabNavigation from '../../../../hooks/useTabNavigation';
 import { toast } from 'react-toastify';
@@ -155,8 +155,13 @@ const LocationEvent = () => {
         }
   
         await createCompleteEvent(eventDataWithFile, typeEventData, locationData);
-        toast.success('Evento creado exitosamente!');
-        
+
+        await ConfirmationModal.show({
+          title: 'Evento creado exitosamente',
+          icon: 'success',
+          confirmButtonText: 'Aceptar'
+        });
+
       } catch (error) {
         console.error('Error al crear el evento:', error);
         toast.error(error.message || 'Ocurrió un error al crear el evento');

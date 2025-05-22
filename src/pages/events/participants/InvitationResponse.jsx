@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState,useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FiCheckCircle, FiXCircle } from "react-icons/fi";
-import axiosInstance from "../../../config/AxiosInstance"; 
+import axiosInstance from "../../../config/AxiosInstance"; // ajusta según tu estructura
 
 export default function InvitationResponse() {
-  const { token, action } = useParams(); 
-  const [status, setStatus] = useState(null); 
+  const { token, action } = useParams();
+  const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const hasRequested = useRef(false);
 
@@ -13,7 +13,7 @@ export default function InvitationResponse() {
     const handleInvitation = async () => {
       try {
         if (action === "rechazar") {
-          await axiosInstance.get(`/invitacion/${token}/rechazar`);
+          await axiosInstance.get(`/invitacion/rechazar/${token}`);
           setStatus("rejected");
         } else {
           await axiosInstance.get(`/invitacion/${token}`);

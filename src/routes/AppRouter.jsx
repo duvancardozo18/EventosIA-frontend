@@ -92,14 +92,14 @@ import Layout from "./layout";
     },
 
     {
+      path: "/invitacion/:action/:token",
+      element: <InvitationResponse />
+    },
+    {
       path: "/invitacion/:token",
       element: <InvitationResponse />
     },
 
-    {
-      path: "/invitacion/:token/rechazar",
-      element: <InvitationResponse />
-    },
     
     {
       path: "/dashboard",

@@ -13,6 +13,8 @@ export const AuthProvider = ({ children }) => {
   const [email, setEmail] = useState(null)
   const [permissions, setPermissions] = useState([])
   const [role, setRole] = useState(null)
+  const [name, setName] = useState(null)
+  const [lastName, setLastName] = useState(null)
   const [loading, setLoading] = useState(true)
   const [authInitialized, setAuthInitialized] = useState(false)
   const [error, setError] = useState(null)
@@ -67,17 +69,23 @@ export const AuthProvider = ({ children }) => {
         if (decodedToken && decodedToken.exp * 1000 > Date.now()) {
           setUserId(decodedToken.id_user)
           setEmail(decodedToken.email || "")
-          setRole(decodedToken.id_role) 
+          setRole(decodedToken.id_role)
+          setName(decodedToken.name || "")
+          setLastName(decodedToken.last_name || "")
           console.log("ID de usuario establecido:", decodedToken.id_user)
         } else {
           console.warn("El token es inválido o ha expirado")
           localStorage.removeItem("access_token")
           setIsAuthenticated(false)
           setRole(null)
+          setName(null)
+          setLastName(null)
         }
       } else {
         setIsAuthenticated(false)
         setRole(null)
+        setName(null)
+        setLastName(null)
       }
       setLoading(false)
       setAuthInitialized(true)
@@ -96,7 +104,9 @@ export const AuthProvider = ({ children }) => {
 
       if (decodedToken) {
         setUserId(decodedToken.id_user)
-        setRole(decodedToken.id_role) 
+        setRole(decodedToken.id_role)
+        setName(decodedToken.name || "")
+        setLastName(decodedToken.last_name || "")
         console.log("Login - ID de usuario establecido:", decodedToken.id_user)
       }
     } catch (error) {
@@ -114,6 +124,8 @@ export const AuthProvider = ({ children }) => {
       setEmail(null)
       setRole(null)
       setPermissions([])
+      setName(null)
+      setLastName(null)
       setError(null)
     } catch (error) {
       console.error("Error durante el logout:", error)
@@ -129,6 +141,8 @@ export const AuthProvider = ({ children }) => {
         email,
         permissions,
         role,
+        name,
+        lastName,
         loading,
         authInitialized,
         error,

@@ -36,7 +36,6 @@ export const Sidebar = forwardRef(({ collapsed, onItemClick }, ref) => {
             )}
         >
             <div className="flex items-center p-3 gap-x-3">
-                <CgProfile size={24} />
                 {!collapsed && <p className="text-lg font-medium transition-colors text-slate-900">EventosIA</p>}
             </div>
             <div className="flex w-full flex-col gap-y-4 overflow-y-auto overflow-x-hidden p-3 [scrollbar-width:_thin]">

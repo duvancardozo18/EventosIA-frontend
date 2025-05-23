@@ -17,10 +17,6 @@ export default function Profile() {
                     <span className="font-semibold text-gray-600">Nombre</span>
                     <span className="text-gray-900">{name || ""}</span>
                 </div>
-                <div className="flex items-center justify-between border-b pb-2">
-                    <span className="font-semibold text-gray-600">Apellido</span>
-                    <span className="text-gray-900">{last_name || ""}</span>
-                </div>
                 
                 <div className="flex items-center justify-between border-b pb-2">
                     <span className="font-semibold text-gray-600">Correo</span>

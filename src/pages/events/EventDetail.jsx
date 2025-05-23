@@ -146,7 +146,7 @@ const EventDetail = () => {
                 src={event.image_url[0]}
                 alt={event.event_name}
                 className="w-full h-full object-cover object-center"
-                style={{ maxHeight: 400 }}
+                style={{ minHeight: 550 }} // Asegura que la imagen tenga un tamaño mínimo
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-500" style={{ minHeight: 250 }}>

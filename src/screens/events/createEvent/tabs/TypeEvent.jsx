@@ -45,11 +45,19 @@ const TypeEvent = () => {
   };
 
   const handleNumberChange = (field, value) => {
-    setLocalData(prev => ({
-      ...prev,
-      [field]: value === "" ? null : Number(value)
-    }));
+    if (/^\d*$/.test(value)) {
+      const numericValue = parseInt(value, 10);
+      if (!isNaN(numericValue) && numericValue <= 100000) {
+        setLocalData(prev => ({ ...prev, [field]: value }));
+        setErrors(prev => ({ ...prev, max_Participants: null }));
+      } else if (numericValue > 100) {
+        setErrors(prev => ({ ...prev, max_Participants: 'El máximo permitido es 100.000' }));
+      } else {
+        setLocalData(prev => ({ ...prev, [field]: value }));
+      }
+    }
   };
+
 
   const formatDateToISO = (dateStr, timeStr) => {
     if (!dateStr || !timeStr) return null;
@@ -128,16 +136,16 @@ const TypeEvent = () => {
       newErrors.price = "El precio es obligatorio";
     } else if (localData.tipo_price < 0) {
       newErrors.price = "El precio no puede ser negativo";
-    } else if (localData.tipo_price > 9999999) {
-      newErrors.price = "El precio no puede exceder $10,000";
+    } else if (localData.tipo_price > 999999999) {
+      newErrors.price = "El precio no puede exceder $999,000,000";
     }
 
     if (localData.tipo_maxParticipants === null || isNaN(localData.tipo_maxParticipants)) {
       newErrors.max_Participants = "El máximo de participantes es obligatorio";
     } else if (localData.tipo_maxParticipants < 1) {
       newErrors.max_Participants = "Debe haber al menos 1 participante";
-    } else if (localData.tipo_maxParticipants > 1000) {
-      newErrors.max_Participants = "El máximo de participantes no puede exceder 1000";
+    } else if (localData.tipo_maxParticipants > 100000) {
+      newErrors.max_Participants = "El máximo de participantes no puede exceder 100.000";
     }
 
     setErrors(newErrors);

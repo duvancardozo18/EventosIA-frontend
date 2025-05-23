@@ -151,7 +151,7 @@ const TypeEventForm = ({
             id="tipo_maxParticipants"
             value={localData.tipo_maxParticipants || ''}
             onChange={(e) => handleNumberChange('tipo_maxParticipants', e.target.value)}
-            min="1"
+            maxLength="3"
             className={`w-full ${errors.max_Participants ? 'border-red-500' : ''}`}
           />
           {errors.max_Participants && (

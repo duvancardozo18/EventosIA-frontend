@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ConfirmationModal from '../../components/ConfirmationModal';
 import Swal from 'sweetalert2';
+import { AuthContext } from "../../config/AuthProvider";
+
 import {
   FiCalendar,
   FiMapPin,
@@ -18,6 +20,7 @@ import {
   FiShoppingCart
 } from 'react-icons/fi';
 import BackButton from '../../components/BackButton';
+import { RollerCoaster } from 'lucide-react';
 
 const tabs = ['Participantes', 'Recursos', 'Alimentos'];
 
@@ -36,6 +39,12 @@ const EventDetail = () => {
   const [errorTab, setErrorTab] = useState('');
   const [showModal, setShowModal] = useState(false);
 
+
+  const {role} = useContext(AuthContext)
+  
+  const userRole = role
+  
+ 
 
   // Carga detalles generales
   useEffect(() => {
@@ -203,12 +212,14 @@ const EventDetail = () => {
               </li>
             </ul>
           </div>
-          <button
-            className="mt-8 self-start px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
-            onClick={handleEditEvent}
-          >
-            Editar Ajustes
-          </button>
+            {(userRole === 1 || userRole === 2) && (
+              <button
+                className="mt-8 self-start px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
+                onClick={handleEditEvent}
+              >
+                Editar Ajustes
+              </button>
+            )}
         </div>
 
         {/* Descripción y Tabs */}
@@ -217,6 +228,7 @@ const EventDetail = () => {
           <p className="text-gray-600 leading-relaxed mb-8">{event.event_type_description || 'No hay descripción disponible.'}</p>
 
           {/* Tabs */}
+          {(userRole === 1 || userRole === 2) && (
           <div className="border-b border-gray-200 mb-6">
             <nav className="flex justify-center space-x-12" aria-label="Tabs">
               {tabs.map(tab => (
@@ -230,182 +242,192 @@ const EventDetail = () => {
               ))}
             </nav>
           </div>
+          )}
+
 
           {/* Contenido de la pestaña */}
-          {loadingTab ? (
-            <p className="text-center py-10">Cargando {activeTab.toLowerCase()}...</p>
-          ) : errorTab ? (
-            <p className="text-center py-10 text-red-500">Error: {errorTab}</p>
-          ) : (
-            <>
-              {activeTab === 'Participantes' && dataTab.Participantes && (
-                <>
-                  {/* Resumen de estados */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 p-6">
-                    <div className="flex items-center">
-                      <FiCheckCircle className="text-indigo-600 mr-2" />
-                      <span className="text-gray-700">Confirmados {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'confirmado').length}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <FiClock className="text-indigo-600 mr-2" />
-                      <span className="text-gray-700">Pendientes {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'pendiente').length}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <FiUser className="text-gray-500 mr-2" />
-                      <span className="text-gray-700">Asistió {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'asistió').length}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <FiXCircle className="text-gray-600 mr-2" />
-                      <span className="text-gray-700">Cancelado {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'cancelado').length}</span>
-                    </div>
-                    
-                  </div>
-
-
-                  {/* Botón de agregar participante */}
-                  <div className="flex justify-end max-w-3xl mx-auto mb-4">
-                    <button 
-                      onClick={() => navigate(`/dashboard/events/invite/${id}`)}
-                      className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none"
-                    >
-                      <FiPlus size={24} />
-                    </button>
-                  </div>
-
-                  {/* Listado */}
-                  <div className="space-y-4 max-w-3xl mx-auto">
-                    {dataTab.Participantes.length === 0 ? (
-                      <div className="flex flex-col items-center text-center text-gray-500 space-y-4 py-10">
-                        <FiUser size={48} className="text-gray-400" />
-                        <p className="text-lg font-semibold">No hay participantes</p>
-                        <p className="text-sm">Puedes agregar participantes oprimiendo el botón de arriba.</p>
+          {(userRole === 1 || userRole === 2) ? (
+            loadingTab ? (
+              <p className="text-center py-10">Cargando {activeTab.toLowerCase()}...</p>
+            ) : errorTab ? (
+              <p className="text-center py-10 text-red-500">Error: {errorTab}</p>
+            ) : (
+              <>
+                {activeTab === 'Participantes' && dataTab.Participantes && (
+                  <>
+                    {/* Resumen de estados */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 p-6">
+                      <div className="flex items-center">
+                        <FiCheckCircle className="text-indigo-600 mr-2" />
+                        <span className="text-gray-700">Confirmados {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'confirmado').length}</span>
                       </div>
-                    ) : (
-                      <>
-                        {dataTab.Participantes.slice(0, 3).map(u => (
-                          <div key={u.id} className="flex items-start bg-white p-4 rounded-lg shadow">
-                            <FiUser size={32} className="text-gray-400 mr-4" />
-                            <div className="flex flex-col">
-                              <p className="font-semibold text-gray-900">{u.user_name + u.user_last_name}</p>
-                              <p className="text-sm text-gray-500 mb-2">{u.email}</p>
-                              <div className="flex items-center">
-                                {u.status_name === 'confirmado' && <FiCheckCircle className="text-green-500 mr-1" />}
-                                {u.status_name === 'pendiente' && <FiClock className="text-yellow-500 mr-1" />}
-                                {u.status_name === 'cancelado' && <FiXCircle className="text-red-500 mr-1" />}
-                                <span className="text-sm text-black font-semibold bg-gray-200 rounded-2xl px-3 py-1">
-                                  {u.status_name}
-                                </span>
+                      <div className="flex items-center">
+                        <FiClock className="text-indigo-600 mr-2" />
+                        <span className="text-gray-700">Pendientes {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'pendiente').length}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <FiUser className="text-gray-500 mr-2" />
+                        <span className="text-gray-700">Asistió {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'asistió').length}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <FiXCircle className="text-gray-600 mr-2" />
+                        <span className="text-gray-700">Cancelado {dataTab.Participantes.filter(u => u.status_name?.toLowerCase() === 'cancelado').length}</span>
+                      </div>
+                    </div>
+
+                    {/* Botón de agregar participante */}
+                    <div className="flex justify-end max-w-3xl mx-auto mb-4">
+                      <button 
+                        onClick={() => navigate(`/dashboard/events/invite/${id}`)}
+                        className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none"
+                      >
+                        <FiPlus size={24} />
+                      </button>
+                    </div>
+
+                    {/* Listado */}
+                    <div className="space-y-4 max-w-3xl mx-auto">
+                      {dataTab.Participantes.length === 0 ? (
+                        <div className="flex flex-col items-center text-center text-gray-500 space-y-4 py-10">
+                          <FiUser size={48} className="text-gray-400" />
+                          <p className="text-lg font-semibold">No hay participantes</p>
+                          <p className="text-sm">Puedes agregar participantes oprimiendo el botón de arriba.</p>
+                        </div>
+                      ) : (
+                        <>
+                          {dataTab.Participantes.slice(0, 3).map(u => (
+                            <div key={u.id} className="flex items-start bg-white p-4 rounded-lg shadow">
+                              <FiUser size={32} className="text-gray-400 mr-4" />
+                              <div className="flex flex-col">
+                                <p className="font-semibold text-gray-900">{u.user_name + u.user_last_name}</p>
+                                <p className="text-sm text-gray-500 mb-2">{u.email}</p>
+                                <div className="flex items-center">
+                                  {u.status_name === 'confirmado' && <FiCheckCircle className="text-green-500 mr-1" />}
+                                  {u.status_name === 'pendiente' && <FiClock className="text-yellow-500 mr-1" />}
+                                  {u.status_name === 'cancelado' && <FiXCircle className="text-red-500 mr-1" />}
+                                  <span className="text-sm text-black font-semibold bg-gray-200 rounded-2xl px-3 py-1">
+                                    {u.status_name}
+                                  </span>
+                                </div>
                               </div>
                             </div>
+                          ))}
+                        </>
+                      )}
+
+                      {/* Link al final */}
+                      <button
+                        onClick={() => navigate(`/dashboard/events/participants/${id}`)}
+                        className="text-indigo-600 hover:underline font-semibold mt-4"
+                      >
+                        Ver todos los participantes
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {/* Recursos */}
+                {activeTab === 'Recursos' && dataTab.Recursos && (
+                  <>
+                    <div className="flex justify-between items-center mb-4 p-6">
+                      <a
+                        onClick={() => navigate(`/dashboard/events/detail-events/${id}/resource-list`)}
+                        className="text-indigo-600 hover:underline font-semibold">Ver todos los recursos</a>
+                      <button
+                        onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-resource`)}
+                        className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
+                        <FiPlus size={24} />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-3">
+                      {dataTab.Recursos.length === 0 ? (
+                        <div className="col-span-full flex flex-col items-center text-center text-gray-500 space-y-4 py-10">
+                          <FiBox size={48} className="text-gray-400" />
+                          <p className="text-lg font-semibold">No hay recursos</p>
+                          <p className="text-sm">Puedes agregar recursos usando el botón de arriba.</p>
+                        </div>
+                      ) : (
+                        dataTab.Recursos.slice(0, 3).map(r => (
+                          <div key={r.id} className="bg-white p-4 rounded-lg shadow flex justify-between">
+                            <div>
+                              <p className="font-semibold text-gray-900 mb-1">{r.name}</p>
+                              <p className="text-sm text-gray-500">{r.quantity_available} unidades</p>
+                              <p className="text-sm text-gray-500">{r.description}</p>
+                              <p className="text-sm text-gray-500">Precio unitario: ${Number(r.price).toFixed(2)}</p>
+                            </div>
+                            <div className="flex items-center justify-between mt-4">
+                              <p className="font-semibold text-indigo-600 flex items-center">
+                                <FiDollarSign className="mr-1" />
+                                {(Number(r.price) * Number(r.quantity_available)).toFixed(2)}
+                              </p>
+                            </div>
                           </div>
-                        ))}
-                      </>
-                    )}
+                        ))
+                      )}
+                    </div>
+                  </>
+                )}
 
+                {/* Alimentos */}
+                {activeTab === 'Alimentos' && dataTab.Alimentos && (
+                  <>
+                    <div className="flex justify-between items-center mb-4 p-6">
+                      <a
+                        onClick={() => navigate(`/dashboard/events/detail-events/${id}/food-list`)}
+                        className="text-indigo-600 hover:underline font-semibold">Ver todos los alimentos</a>
+                      <button
+                        onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-food`)}
+                        className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
+                        <FiPlus size={24} />
+                      </button>
+                    </div>
 
-
-                    {/* Link al final */}
-                    <button
-                      onClick={() => navigate(`/dashboard/events/participants/${id}`)}
-                      className="text-indigo-600 hover:underline font-semibold mt-4"
-                    >
-                      Ver todos los participantes
-                    </button>
-
-                  </div>
-                </>
-              )}
-
-              {/* Recursos y Comida siguen igual */}
-              {activeTab === 'Recursos' && dataTab.Recursos && (
-                <>
-                  <div className="flex justify-between items-center mb-4 p-6">
-                    <a
-                      onClick={() => navigate(`/dashboard/events/detail-events/${id}/resource-list`)}
-                      className="text-indigo-600 hover:underline font-semibold">Ver todos los recursos</a>
-                    <button
-                      onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-resource`)}
-                      className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
-                      <FiPlus size={24} />
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-3">
-                    {dataTab.Recursos.length === 0 ? (
-                      <div className="col-span-full flex flex-col items-center text-center text-gray-500 space-y-4 py-10">
-                        <FiBox size={48} className="text-gray-400" />
-                        <p className="text-lg font-semibold">No hay recursos</p>
-                        <p className="text-sm">Puedes agregar recursos usando el botón de arriba.</p>
-                      </div>
-                    ) : (
-                      dataTab.Recursos.slice(0, 3).map(r => (
-                        <div key={r.id} className="bg-white p-4 rounded-lg shadow flex justify-between">
-                          <div>
-                            <p className="font-semibold text-gray-900 mb-1">{r.name}</p>
-                            <p className="text-sm text-gray-500">{r.quantity_available} unidades</p>
-                            <p className="text-sm text-gray-500">{r.description}</p>
-                            <p className="text-sm text-gray-500">Precio unitario: ${Number(r.price).toFixed(2)}</p>
-                          </div>
-                          <div className="flex items-center justify-between mt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {dataTab.Alimentos.length === 0 ? (
+                        <div className="col-span-full flex flex-col items-center text-center text-gray-500 space-y-4 py-10">
+                          <FiShoppingCart size={48} className="text-gray-400" />
+                          <p className="text-lg font-semibold">No hay alimentos</p>
+                          <p className="text-sm">Puedes agregar alimentos usando el botón de arriba.</p>
+                        </div>
+                      ) : (
+                        dataTab.Alimentos.slice(0, 3).map(f => (
+                          <div key={f.id} className="bg-white p-4 rounded-lg shadow flex justify-between">
+                            <div>
+                              <p className="font-semibold text-gray-900 mb-1">{f.name}</p>
+                              <p className="text-sm text-gray-500">{f.quantity_available} unidades</p>
+                              <p className="text-sm text-gray-500">{f.description}</p>
+                              <p className="text-sm text-gray-500">Precio unitario: ${Number(f.price).toFixed(2)}</p>
+                            </div>
                             <p className="font-semibold text-indigo-600 flex items-center">
                               <FiDollarSign className="mr-1" />
-                              {(Number(r.price) * Number(r.quantity_available)).toFixed(2)}
+                              {(Number(f.price) * Number(f.quantity_available)).toFixed(2)}
                             </p>
                           </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </>
-              )}
-
-              {activeTab === 'Alimentos' && dataTab.Alimentos && (
-                <>
-                  <div className="flex justify-between items-center mb-4 p-6">
-                    <a
-                      onClick={() => navigate(`/dashboard/events/detail-events/${id}/food-list`)}
-                      className="text-indigo-600 hover:underline font-semibold">Ver todos los alimentos</a>
-                    <button
-                      onClick={() => navigate(`/dashboard/events/detail-events/${id}/add-food`)}
-                      className="bg-indigo-600 text-white p-2 rounded-full shadow hover:bg-indigo-700 focus:outline-none">
-                      <FiPlus size={24} />
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {dataTab.Alimentos.length === 0 ? (
-                      <div className="col-span-full flex flex-col items-center text-center text-gray-500 space-y-4 py-10">
-                        <FiShoppingCart size={48} className="text-gray-400" />
-                        <p className="text-lg font-semibold">No hay alimentos</p>
-                        <p className="text-sm">Puedes agregar alimentos usando el botón de arriba.</p>
-                      </div>
-                    ) : (
-                      dataTab.Alimentos.slice(0, 3).map(f => (
-                        <div key={f.id} className="bg-white p-4 rounded-lg shadow flex justify-between">
-                          <div>
-                            <p className="font-semibold text-gray-900 mb-1">{f.name}</p>
-                            <p className="text-sm text-gray-500">{f.quantity_available} unidades</p>
-                            <p className="text-sm text-gray-500">{f.description}</p>
-                            <p className="text-sm text-gray-500">Precio unitario: ${Number(f.price).toFixed(2)}</p>
-                          </div>
-                          <p className="font-semibold text-indigo-600 flex items-center">
-                            <FiDollarSign className="mr-1" />
-                            {(Number(f.price) * Number(f.quantity_available)).toFixed(2)}
-                          </p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </>
-              )}
-            </>
+                        ))
+                      )}
+                    </div>
+                  </>
+                )}
+              </>
+            )
+          ) : (
+            <p className="text-center py-10 text-gray-500"></p>
           )}
+
         </div>
       </div>
+      {(userRole === 1 || userRole === 2) && (    
       <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-10 items-center justify-center mt-10">
         <button className='bg-red-500 rounded-xl px-6 py-3 text-xl text-white' onClick={handleDeleteEvent}>Eliminar evento</button>
         <button className='bg-indigo-500 rounded-xl px-6 py-3 text-xl text-white' onClick={handleBIlling}>Facturación</button>
       </div>
+       )}
+      {(userRole === 4) && (    
+      <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-10 items-center justify-center mt-10">
+        <button className='bg-indigo-500 rounded-xl px-6 py-3 text-xl text-white' onClick={handleBIlling}>Facturación</button>
+      </div>
+       )}
       <ConfirmationModal
         showModal={showModal}
         onClose={() => setShowModal(false)}

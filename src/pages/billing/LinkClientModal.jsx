@@ -28,6 +28,7 @@ const LinkClientModal = ({ showModal, onClose, onSuccess }) => {
     name: '',
     last_name: '',
     email: '',
+    id_role: 4,
   })
   const [nameError, setNameError] = useState('')
   const [lastNameError, setLastNameError] = useState('')

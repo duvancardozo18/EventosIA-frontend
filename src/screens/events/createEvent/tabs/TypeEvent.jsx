@@ -59,6 +59,21 @@ const TypeEvent = () => {
   };
 
 
+    const handleNumberChange2 = (field, value) => {
+    if (/^\d*$/.test(value)) {
+      const numericValue = parseInt(value, 10);
+      if (!isNaN(numericValue) && numericValue <= 100000000) {
+        setLocalData(prev => ({ ...prev, [field]: value }));
+        setErrors(prev => ({ ...prev, price: null }));
+      } else if (numericValue > 100) {
+        setErrors(prev => ({ ...prev, price: 'El máximo permitido es 100.000.000' }));
+      } else {
+        setLocalData(prev => ({ ...prev, [field]: value }));
+      }
+    }
+  };
+
+
   const formatDateToISO = (dateStr, timeStr) => {
     if (!dateStr || !timeStr) return null;
   
@@ -186,6 +201,7 @@ const TypeEvent = () => {
           errors={errors}
           handleChange={handleChange}
           handleNumberChange={handleNumberChange}
+          handleNumberChange2={handleNumberChange2}
         />
       </div>
       <NavigationButtons

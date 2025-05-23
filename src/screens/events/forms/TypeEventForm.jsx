@@ -7,6 +7,7 @@ const TypeEventForm = ({
   errors,
   handleChange,
   handleNumberChange,
+  handleNumberChange2,
 }) => {
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
@@ -168,7 +169,7 @@ const TypeEventForm = ({
             type="number"
             id="tipo_price"
             value={localData.tipo_price || ''}
-            onChange={(e) => handleNumberChange('tipo_price', e.target.value)}
+            onChange={(e) => handleNumberChange2('tipo_price', e.target.value)}
             min="0"
             step="0.01"
             className={`w-full ${errors.price ? 'border-red-500' : ''}`}
